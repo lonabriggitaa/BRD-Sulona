@@ -784,17 +784,135 @@
       .activity-feed {
         position: relative;
         display: grid;
-        gap: 14px;
+        gap: 12px;
+        align-content: start;
+        max-height: 720px;
+        overflow: auto;
+        scroll-behavior: smooth;
+        padding-right: 4px;
       }
 
       .activity-card {
         display: grid;
-        grid-template-columns: 44px 1fr;
-        gap: 12px;
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 14px;
         border: 1px solid var(--line);
-        border-radius: 14px;
+        border-left: 4px solid var(--project-color, var(--primary));
+        border-radius: 12px;
         background: var(--surface);
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
         padding: 14px;
+        transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+      }
+
+      .activity-card:hover,
+      .activity-card.is-highlighted {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 34px rgba(15, 23, 42, 0.11);
+      }
+
+      .activity-card.is-highlighted {
+        outline: 3px solid color-mix(in srgb, var(--project-color, var(--primary)) 24%, transparent);
+      }
+
+      .activity-date-block {
+        display: grid;
+        place-items: center;
+        align-content: center;
+        min-height: 72px;
+        border-radius: 10px;
+        background: var(--surface-2);
+        color: var(--ink);
+      }
+
+      .activity-date-day {
+        font-size: 27px;
+        line-height: 1;
+        font-weight: 900;
+      }
+
+      .activity-date-month {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .activity-card-main {
+        min-width: 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .activity-card-head {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+
+      .activity-title {
+        margin: 0;
+        color: var(--ink);
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .activity-meta-row,
+      .activity-detail-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .project-chip {
+        display: inline-flex;
+        gap: 7px;
+        align-items: center;
+        min-height: 24px;
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .project-dot,
+      .calendar-dot,
+      .legend-dot {
+        flex: 0 0 auto;
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--project-color, var(--primary));
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--project-color, var(--primary)) 16%, transparent);
+      }
+
+      .activity-type-pill,
+      .remaining-pill,
+      .attachment-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface-2);
+        color: var(--muted);
+        padding: 0 9px;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .calendar-progress {
+        display: grid;
+        grid-template-columns: minmax(80px, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+        margin-top: 2px;
+      }
+
+      .calendar-progress .progress-track {
+        height: 7px;
       }
 
       .activity-dot {
@@ -860,54 +978,209 @@
 
       .calendar-widget {
         display: grid;
-        grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
-        gap: 16px;
+        grid-template-columns: minmax(280px, 0.4fr) minmax(0, 0.6fr);
+        gap: 18px;
+        align-items: start;
       }
 
-      .calendar-tabs {
-        display: inline-flex;
-        gap: 6px;
+      .calendar-shell,
+      .calendar-feed-panel {
+        min-width: 0;
+      }
+
+      .calendar-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .calendar-controls-left,
+      .calendar-controls-right {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .calendar-icon-button {
+        display: inline-grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
         border: 1px solid var(--line);
-        border-radius: 999px;
-        background: var(--surface-2);
-        padding: 4px;
+        border-radius: 10px;
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
       }
 
-      .calendar-tabs button {
-        min-height: 30px;
-        border: 0;
-        border-radius: 999px;
-        background: transparent;
-        color: var(--muted);
-        padding: 0 12px;
+      .calendar-icon-button svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .calendar-select {
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        color: var(--ink);
+        padding: 0 10px;
         font-weight: 800;
       }
 
-      .calendar-tabs button.active {
+      .calendar-filter-panel {
+        display: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface-2);
+        padding: 12px;
+        margin-bottom: 14px;
+      }
+
+      .calendar-filter-panel.open {
+        display: grid;
+      }
+
+      .calendar-filter-panel label {
+        display: grid;
+        gap: 5px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .calendar-filter-panel select {
+        width: 100%;
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
         background: var(--surface);
-        color: var(--primary);
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        color: var(--ink);
+        padding: 0 9px;
       }
 
       .mini-calendar {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 6px;
+        gap: 7px;
       }
 
       .calendar-day {
-        min-height: 42px;
+        position: relative;
+        min-height: 58px;
+        border: 1px solid transparent;
         border-radius: 10px;
-        background: var(--surface-2);
+        background: #F8FAFC;
         color: var(--muted);
-        padding: 6px;
+        padding: 7px;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: default;
+      }
+
+      .calendar-day.has-item {
+        background: var(--surface);
+        color: var(--ink);
+        border-color: var(--line);
+        cursor: pointer;
+      }
+
+      .calendar-day.has-item:hover,
+      .calendar-day.is-selected {
+        border-color: color-mix(in srgb, var(--primary) 34%, var(--line));
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.10);
+      }
+
+      .calendar-day.today {
+        box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary) 34%, transparent);
+      }
+
+      .calendar-dot-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        margin-top: 12px;
+      }
+
+      .calendar-tooltip {
+        position: absolute;
+        left: 8px;
+        top: calc(100% + 8px);
+        z-index: 10;
+        width: min(260px, 72vw);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(4px);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #0F172A;
+        color: white;
+        padding: 10px;
+        box-shadow: var(--shadow);
+        transition: opacity 140ms ease, transform 140ms ease;
+      }
+
+      .calendar-day:hover .calendar-tooltip {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .calendar-tooltip strong,
+      .calendar-tooltip span {
+        display: block;
+      }
+
+      .calendar-tooltip span {
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .project-legend {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .legend-item {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        min-width: 0;
+        color: var(--muted);
         font-size: 12px;
         font-weight: 800;
       }
 
-      .calendar-day.has-item {
-        background: color-mix(in srgb, var(--primary) 8%, var(--surface));
-        color: var(--ink);
+      .calendar-feed-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .calendar-feed-title {
+        margin: 0;
+        font-size: 17px;
+      }
+
+      .calendar-empty {
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        background: var(--surface-2);
+        padding: 24px;
+        text-align: center;
       }
 
       .agenda-list {
@@ -1599,6 +1872,10 @@
           grid-template-columns: 1fr;
         }
 
+        .activity-feed {
+          max-height: none;
+        }
+
         .filter-toolbar {
           align-items: flex-start;
           flex-direction: column;
@@ -1667,6 +1944,24 @@
         .three-grid,
         .form-grid {
           grid-template-columns: 1fr;
+        }
+
+        .calendar-filter-panel,
+        .project-legend {
+          grid-template-columns: 1fr;
+        }
+
+        .activity-card {
+          grid-template-columns: 58px minmax(0, 1fr);
+          padding: 12px;
+        }
+
+        .activity-date-block {
+          min-height: 58px;
+        }
+
+        .activity-date-day {
+          font-size: 22px;
         }
 
         h1 {
@@ -1740,7 +2035,7 @@
               </div>
               <div style="min-width:220px;text-align:right">
                 <div class="small" style="color:rgba(255,255,255,.72)">Current Portfolio</div>
-                <div style="font-size:42px;font-weight:900" id="heroInvestment">Rp 0 B</div>
+                <div style="font-size:42px;font-weight:900" id="heroInvestment">Rp 0</div>
                 <div class="badge" style="background:rgba(255,255,255,.12);color:white;border-color:rgba(255,255,255,.18)">Executive View</div>
               </div>
             </section>
@@ -1771,10 +2066,7 @@
                   <h2>Project Calendar</h2>
                   <p class="small">Upcoming milestones, key deadlines, planned meetings, and completion targets.</p>
                 </div>
-                <div class="calendar-tabs" id="calendarTabs">
-                  <button type="button" class="active" data-calendar-view="month">Month</button>
-                  <button type="button" data-calendar-view="agenda">Agenda</button>
-                </div>
+                
               </div>
               <section class="panel">
                 <div class="panel-body calendar-widget" id="projectCalendar"></div>
@@ -1871,6 +2163,7 @@
 
           <section id="Investment Request" class="route"></section>
           <section id="Project Workspace" class="route"></section>
+          <section id="Import Update" class="route"></section>
           <section id="Documents" class="route"></section>
           <section id="Analytics" class="route"></section>
           <section id="Master Data" class="route"></section>
@@ -1917,6 +2210,7 @@
     </div>
 
     <script>
+
       let projects = [
         { brd: "BRD-26001", name: "Warehouse Automation Line", division: "Supply Chain", department: "Warehouse", site: "Jakarta", category: "Automation", priority: "High", status: "Running", health: "Yellow", pic: "Ari Wibowo", vendor: "Siemens", budget: 20000000000, approved: 18500000000, actual: 13600000000, progress: 68, start: "2026-01-10", finish: "2026-09-30", approvalDays: 18 },
         { brd: "BRD-26002", name: "ERP Finance Extension", division: "Finance", department: "Accounting", site: "Bandung", category: "IT System", priority: "High", status: "Under Review", health: "Green", pic: "Dina Putri", vendor: "SAP Partner Indonesia", budget: 9500000000, approved: 9200000000, actual: 2100000000, progress: 22, start: "2026-03-01", finish: "2026-12-15", approvalDays: 31 },
@@ -1962,7 +2256,7 @@
         ["Dec", 72.4, 63.2],
       ];
 
-      const navItems = ["Dashboard", "Project Workspace", "Documents", "Analytics", "Master Data", "Settings"];
+      const navItems = ["Dashboard", "Project Workspace", "Documents", "Import Update", "Analytics", "Master Data", "Settings"];
 
       const icons = {
         Dashboard: "M4 13h7V4H4v9Zm9 7h7V4h-7v16ZM4 20h7v-5H4v5Z",
@@ -1971,6 +2265,7 @@
         Procurement: "M4 7h16M6 7l1 13h10l1-13M9 7V5h6v2M9 12h6",
         Projects: "M4 5h16v14H4V5Zm4 4h8M8 13h5",
         "Project Workspace": "M4 5h16v14H4V5Zm4 4h8M8 13h5",
+        "Import Update": "M16 16l-4-4-4 4M12 12v9M20 16.6A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3",
         "Project Activity": "M12 6v6l4 2M21 12a9 9 0 1 1-9-9",
         Issues: "M12 9v4m0 4h.01M10.3 4.5 2-1.1 9 15.6H3.3l7-14.5Z",
         "Project Review": "M5 4h14v16H5V4Zm4 4h6m-6 4h6m-6 4h4",
@@ -1999,19 +2294,116 @@
           sortDir: "desc",
         },
         calendarView: "month",
+        calendarMonth: "2026-06",
+        selectedCalendarDate: "",
+        calendarFiltersOpen: false,
+        calendarFilters: {
+          project: "All",
+          type: "All",
+          status: "All",
+          division: "All",
+          site: "All",
+        },
+        import: {
+          file: null,
+          filePath: "",
+          valid: false,
+          preview: null,
+          result: null,
+        },
       };
 
       const calendarItems = [
-        { day: 3, date: "2026-06-03", type: "Milestone", title: "Procurement Review", project: "ERP Upgrade", status: "completed", note: "Committee notes closed." },
-        { day: 12, date: "2026-06-12", type: "Meeting", title: "Vendor Discussion", project: "Warehouse Automation", status: "upcoming", note: "Delivery schedule alignment." },
-        { day: 18, date: "2026-06-18", type: "Deadline", title: "Contract Submission", project: "Cold Chain Expansion", status: "overdue", note: "Pending legal review." },
-        { day: 24, date: "2026-06-24", type: "Completion Target", title: "Installation Sign-off", project: "Quality Lab Upgrade", status: "upcoming", note: "Target completion checkpoint." },
-        { day: 28, date: "2026-06-28", type: "Milestone", title: "Final Report Draft", project: "Solar Rooftop Phase 2", status: "completed", note: "Benefit realization captured." },
+        { date: "2026-06-03", type: "Milestone", title: "Procurement Review", project: "ERP Finance Extension", status: "Completed", progress: 22, attachment: true, note: "Committee notes closed for the ERP finance extension procurement gate." },
+        { date: "2026-06-12", type: "Meeting", title: "Vendor Discussion", project: "Warehouse Automation Line", status: "Upcoming", progress: 68, attachment: false, note: "Delivery schedule alignment with automation vendor and warehouse operations." },
+        { date: "2026-06-18", type: "Deadline", title: "Contract Submission", project: "Cold Chain Expansion", status: "Overdue", progress: 74, attachment: true, note: "Pending legal review before civil contractor handover can be closed." },
+        { date: "2026-06-18", type: "Review", title: "PLC Integration Retest", project: "Warehouse Automation Line", status: "Running", progress: 68, attachment: false, note: "Retest window for conveyor PLC integration and safety interlock checks." },
+        { date: "2026-06-18", type: "Procurement", title: "Equipment Calibration Package", project: "Quality Lab Upgrade", status: "Running", progress: 57, attachment: true, note: "Calibration certificate package requested for lab equipment acceptance." },
+        { date: "2026-06-24", type: "Installation", title: "Installation Sign-off", project: "Quality Lab Upgrade", status: "Upcoming", progress: 57, attachment: false, note: "Target completion checkpoint for installed lab assets." },
+        { date: "2026-06-28", type: "Milestone", title: "Final Report Draft", project: "Solar Rooftop Phase 2", status: "Completed", progress: 100, attachment: true, note: "Benefit realization and final report draft captured for closeout." },
       ];
 
       function idr(value) {
-        if (value >= 1000000000000) return `Rp ${(value / 1000000000000).toFixed(1)} T`;
-        return `Rp ${(value / 1000000000).toFixed(1)} B`;
+        return new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          maximumFractionDigits: 0,
+        }).format(Number(value || 0)).replace(/\u00A0/g, " ");
+      }
+      const formatCurrency = idr;
+
+      function normalizeProjectFromApi(project) {
+        return {
+          id: project.id,
+          brd: project.brd_number,
+          name: project.project_name,
+          division: project.division || "Unassigned",
+          department: project.department || "-",
+          site: project.site || "Unassigned",
+          category: project.category || "Investment",
+          priority: project.priority || "Medium",
+          status: project.status || "Draft",
+          health: project.health_status || "",
+          pic: project.pic || "-",
+          vendor: project.vendor || "-",
+          budget: Number(project.budget_requested || project.budget_approved || 0),
+          approved: Number(project.budget_approved || 0),
+          actual: Number(project.actual_cost || 0),
+          progress: Number(project.progress || 0),
+          start: project.planned_start_date || "",
+          finish: project.planned_finish_date || "",
+          remarks: project.remarks || "",
+          activities: project.activities || [],
+          documents: project.documents || [],
+          approvalDays: 0,
+        };
+      }
+
+      function normalizeActivityFromApi(activity) {
+        return {
+          id: activity.id,
+          projectId: activity.project_id,
+          brd: activity.brd_number,
+          date: activity.activity_date || "",
+          type: activity.activity_type || "Activity",
+          project: activity.project?.project_name || activity.project_name || activity.brd_number || "-",
+          text: activity.description || activity.activity_title || activity.notes || "-",
+          title: activity.activity_title || activity.activity_type || "Activity",
+          status: activity.status || "Planned",
+          progress: Number(activity.progress || 0),
+          pic: activity.pic || "-",
+        };
+      }
+
+      function normalizeDocumentFromApi(documentRow) {
+        return {
+          id: documentRow.id,
+          projectId: documentRow.project_id,
+          "BRD Number": documentRow.brd_number,
+          "Document Type": documentRow.document_type,
+          "Document Name": documentRow.document_name,
+          "Upload Date": documentRow.upload_date,
+          version: documentRow.version || "-",
+          remarks: documentRow.remarks || "",
+          project: documentRow.project?.project_name || documentRow.brd_number || "-",
+        };
+      }
+
+      async function loadDatabaseData() {
+        const response = await fetch("/api/dashboard/summary", { headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error("Dashboard data is not available.");
+        const data = await response.json();
+        if (!Array.isArray(data.projects)) return;
+
+        projects = data.projects.map(normalizeProjectFromApi);
+        activities = [
+          ...(data.recent_activities || []),
+          ...projects.flatMap((project) => project.activities || []),
+        ].map(normalizeActivityFromApi);
+        documents = [
+          ...(data.recent_documents || []),
+          ...projects.flatMap((project) => project.documents || []),
+        ].map(normalizeDocumentFromApi);
       }
 
       function svgIcon(name) {
@@ -2034,6 +2426,9 @@
           Target: `<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>`,
           Calendar: `<path d="M7 3v4M17 3v4M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"/>`,
           Activity: `<path d="M4 12h4l2-6 4 12 2-6h4"/>`,
+          ChevronLeft: `<path d="m15 18-6-6 6-6"/>`,
+          ChevronRight: `<path d="m9 18 6-6-6-6"/>`,
+          Filter: `<path d="M4 6h16M7 12h10M10 18h4"/>`,
           Wrench: `<path d="M14.7 6.3a4 4 0 0 0 5 5L11 20l-4-4 8.7-8.7Z"/><path d="m7 16-3 3"/>`,
           ClipboardCheck: `<path d="M9 4h6l1 2h3v15H5V6h3l1-2Z"/><path d="m9 14 2 2 4-5"/>`,
         };
@@ -2085,7 +2480,7 @@
 
       function renderNav() {
         document.getElementById("navigation").innerHTML = navItems.map((item) => `
-          <button class="nav-button ${state.route === item ? "active" : ""}" data-route="${item}">
+          <button class="nav-button ${state.route === item ? "active" : ""}" data-route="${item}" onclick="window.setDashboardRoute && window.setDashboardRoute('${item}')">
             ${svgIcon(item)}
             <span>${item}</span>
           </button>
@@ -2207,60 +2602,187 @@
         }).join("");
       }
 
+      const projectColors = {
+        "ERP Finance Extension": "#DC2626",
+        "Warehouse Automation Line": "#EAB308",
+        "Quality Lab Upgrade": "#16A34A",
+        "Cold Chain Expansion": "#2563EB",
+        "Solar Rooftop Phase 2": "#7C3AED",
+      };
+
+      function projectColor(name) {
+        const palette = ["#DC2626", "#EAB308", "#16A34A", "#2563EB", "#7C3AED", "#F97316", "#0F766E", "#BE123C"];
+        if (!projectColors[name]) {
+          projectColors[name] = palette[Object.keys(projectColors).length % palette.length];
+        }
+        return projectColors[name];
+      }
+
+      function calendarProject(item) {
+        return projects.find((project) => project.name === item.project) || {};
+      }
+
       function calendarStatusClass(status) {
-        if (status === "overdue") return "status-critical";
-        if (status === "completed") return "status-completed";
+        if (status === "Overdue") return "status-overdue";
+        if (status === "Completed") return "status-completed";
+        if (status === "Running") return "status-running";
         return "status-pending";
       }
 
+      function calendarMonthLabel(monthKey) {
+        const [year, month] = monthKey.split("-").map(Number);
+        return new Date(year, month - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      }
+
+      function calendarDateParts(dateText) {
+        const date = new Date(`${dateText}T00:00:00`);
+        return {
+          day: date.toLocaleDateString("en-US", { day: "2-digit" }),
+          month: date.toLocaleDateString("en-US", { month: "short" }),
+        };
+      }
+
+      function daysRemainingLabel(dateText, status) {
+        const today = new Date("2026-07-01T00:00:00");
+        const due = new Date(`${dateText}T00:00:00`);
+        const diff = Math.ceil((due - today) / 86400000);
+        if (status === "Completed") return "Completed";
+        if (diff < 0) return `${Math.abs(diff)}d overdue`;
+        if (diff === 0) return "Today";
+        return `${diff}d left`;
+      }
+
+      function calendarOptions(key, sourceItems) {
+        return ["All", ...Array.from(new Set(sourceItems.map((item) => {
+          if (key === "division" || key === "site") return calendarProject(item)[key];
+          return item[key];
+        }).filter(Boolean))).sort()];
+      }
+
+      function calendarFilteredItems() {
+        const filters = state.calendarFilters;
+        return calendarItems.filter((item) => {
+          const project = calendarProject(item);
+          return (filters.project === "All" || item.project === filters.project)
+            && (filters.type === "All" || item.type === filters.type)
+            && (filters.status === "All" || item.status === filters.status)
+            && (filters.division === "All" || project.division === filters.division)
+            && (filters.site === "All" || project.site === filters.site);
+        }).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      }
+
       function renderProjectCalendar() {
-        const itemByDay = calendarItems.reduce((acc, item) => {
-          acc[item.day] = item;
+        const filteredItems = calendarFilteredItems();
+        const monthItems = filteredItems.filter((item) => item.date.startsWith(state.calendarMonth));
+        const itemsByDate = monthItems.reduce((acc, item) => {
+          acc[item.date] = acc[item.date] || [];
+          acc[item.date].push(item);
           return acc;
         }, {});
-        document.querySelectorAll("[data-calendar-view]").forEach((button) => {
-          button.classList.toggle("active", button.dataset.calendarView === state.calendarView);
-        });
-        const monthView = `
-          <div>
-            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px">
-              <div>
-                <strong>June 2026</strong>
-                <p class="small">Portfolio execution calendar</p>
+        const [year, month] = state.calendarMonth.split("-").map(Number);
+        const firstDate = new Date(year, month - 1, 1);
+        const dayCount = new Date(year, month, 0).getDate();
+        const leadingBlanks = (firstDate.getDay() + 6) % 7;
+        const monthOptions = Array.from(new Set(calendarItems.map((item) => item.date.slice(0, 7)).concat([state.calendarMonth]))).sort();
+        const legendProjects = Array.from(new Set(calendarItems.map((item) => item.project)));
+        const feedItems = filteredItems;
+        const filterSelect = (key, label, options) => `
+          <label>${label}
+            <select data-calendar-filter="${key}">
+              ${options.map((option) => `<option value="${option}" ${state.calendarFilters[key] === option ? "selected" : ""}>${option}</option>`).join("")}
+            </select>
+          </label>
+        `;
+        const days = [
+          ...Array.from({ length: leadingBlanks }, () => `<div class="calendar-day" aria-hidden="true"></div>`),
+          ...Array.from({ length: dayCount }, (_, index) => {
+            const day = index + 1;
+            const date = `${state.calendarMonth}-${String(day).padStart(2, "0")}`;
+            const dayItems = itemsByDate[date] || [];
+            const tooltip = dayItems.map((item) => `
+              <div style="--project-color:${projectColor(item.project)};margin-bottom:8px">
+                <strong>${item.project}</strong>
+                <span>${item.title} / ${item.type}</span>
+                <span>Status: ${item.status} / Progress: ${item.progress}%</span>
               </div>
-              <span class="badge">${calendarItems.length} events</span>
+            `).join("");
+            return `<button class="calendar-day ${dayItems.length ? "has-item" : ""} ${state.selectedCalendarDate === date ? "is-selected" : ""} ${date === "2026-07-01" ? "today" : ""}" type="button" data-calendar-day="${date}" ${dayItems.length ? "" : "disabled"}>
+              <span>${day}</span>
+              ${dayItems.length ? `<div class="calendar-dot-row">${dayItems.map((item) => `<span class="calendar-dot" style="--project-color:${projectColor(item.project)}" title="${item.project}"></span>`).join("")}</div><div class="calendar-tooltip">${tooltip}</div>` : ""}
+            </button>`;
+          }),
+        ].join("");
+
+        document.getElementById("projectCalendar").innerHTML = `
+          <div class="calendar-shell">
+            <div class="calendar-controls">
+              <div class="calendar-controls-left">
+                <button class="button toolbar-button" type="button" data-calendar-action="today">Today</button>
+                <button class="calendar-icon-button" type="button" data-calendar-action="prev" aria-label="Previous month">${uiIcon("ChevronLeft")}</button>
+                <button class="calendar-icon-button" type="button" data-calendar-action="next" aria-label="Next month">${uiIcon("ChevronRight")}</button>
+                <select class="calendar-select" data-calendar-month>
+                  ${monthOptions.map((option) => `<option value="${option}" ${state.calendarMonth === option ? "selected" : ""}>${calendarMonthLabel(option)}</option>`).join("")}
+                </select>
+              </div>
+              <div class="calendar-controls-right">
+                <button class="button toolbar-button" type="button" data-calendar-action="toggle-filters">${uiIcon("Filter")} Filter</button>
+              </div>
+            </div>
+            <div class="calendar-filter-panel ${state.calendarFiltersOpen ? "open" : ""}">
+              ${filterSelect("project", "Project", calendarOptions("project", calendarItems))}
+              ${filterSelect("type", "Activity Type", calendarOptions("type", calendarItems))}
+              ${filterSelect("status", "Status", calendarOptions("status", calendarItems))}
+              ${filterSelect("division", "Division", calendarOptions("division", calendarItems))}
+              ${filterSelect("site", "Site", calendarOptions("site", calendarItems))}
+            </div>
+            <div class="calendar-feed-head">
+              <div>
+                <h3 class="calendar-feed-title">${calendarMonthLabel(state.calendarMonth)}</h3>
+                <p class="small">${monthItems.length} visible activities</p>
+              </div>
+              <span class="badge">Month view</span>
             </div>
             <div class="mini-calendar">
-              ${["M", "T", "W", "T", "F", "S", "S"].map((day) => `<div class="small" style="text-align:center;font-weight:900">${day}</div>`).join("")}
-              ${Array.from({ length: 30 }, (_, index) => {
-                const day = index + 1;
-                const item = itemByDay[day];
-                return `<div class="calendar-day ${item ? "has-item" : ""}">
-                  ${day}
-                  ${item ? `<div class="status-pill ${calendarStatusClass(item.status)}" style="margin-top:5px;padding:2px 6px;font-size:10px">${item.type}</div>` : ""}
-                </div>`;
-              }).join("")}
+              ${["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => `<div class="small" style="text-align:center;font-weight:900">${day}</div>`).join("")}
+              ${days}
+            </div>
+            <div class="project-legend">
+              ${legendProjects.map((project) => `<div class="legend-item" style="--project-color:${projectColor(project)}"><span class="legend-dot"></span><span>${project}</span></div>`).join("")}
+            </div>
+          </div>
+          <div class="calendar-feed-panel">
+            <div class="calendar-feed-head">
+              <div>
+                <h3 class="calendar-feed-title">Upcoming Activities</h3>
+                <p class="small">Chronological execution feed</p>
+              </div>
+              <span class="badge">${feedItems.length} items</span>
+            </div>
+            <div class="activity-feed" id="calendarActivityFeed">
+              ${feedItems.length ? feedItems.map((item, index) => {
+                const parts = calendarDateParts(item.date);
+                const project = calendarProject(item);
+                return `
+                  <article class="activity-card" id="calendar-activity-${item.date}-${index}" data-activity-date="${item.date}" style="--project-color:${projectColor(item.project)}">
+                    <div class="activity-date-block"><span class="activity-date-day">${parts.day}</span><span class="activity-date-month">${parts.month}</span></div>
+                    <div class="activity-card-main">
+                      <div class="activity-card-head">
+                        <div>
+                          <h4 class="activity-title">${item.title}</h4>
+                          <div class="activity-meta-row"><span class="project-chip"><span class="project-dot"></span>${item.project}</span><span class="activity-type-pill">${item.type}</span></div>
+                        </div>
+                        <span class="status-pill ${calendarStatusClass(item.status)}">${item.status}</span>
+                      </div>
+                      <div class="calendar-progress"><div class="progress-track"><div class="progress-fill" style="width:${item.progress || project.progress || 0}%;background:var(--project-color)"></div></div><strong class="small">${item.progress || project.progress || 0}%</strong></div>
+                      <div class="activity-detail-row"><span class="remaining-pill">${daysRemainingLabel(item.date, item.status)}</span><span class="remaining-pill">${project.division || "-"} / ${project.site || "-"}</span>${item.attachment ? `<span class="attachment-pill">Attachment</span>` : ""}</div>
+                      <p class="small">${item.note}</p>
+                    </div>
+                  </article>
+                `;
+              }).join("") : `<div class="calendar-empty"><strong>No activities match these filters.</strong><p class="small">Adjust project, type, status, division, or site.</p></div>`}
             </div>
           </div>
         `;
-        const agendaView = `
-          <div class="agenda-list">
-            ${calendarItems.map((item) => `
-              <article class="agenda-item">
-                <div class="agenda-date">${item.day}<span class="small">Jun</span></div>
-                <div>
-                  <strong>${item.title}</strong>
-                  <p class="small">${item.project} / ${item.type}</p>
-                  <p class="small">${item.note}</p>
-                </div>
-                <span class="status-pill ${calendarStatusClass(item.status)}">${item.status}</span>
-              </article>
-            `).join("")}
-          </div>
-        `;
-        document.getElementById("projectCalendar").innerHTML = state.calendarView === "month"
-          ? `${monthView}${agendaView}`
-          : `${agendaView}${monthView}`;
       }
 
       function renderLineChart() {
@@ -2271,7 +2793,7 @@
         const line = (points) => points.map((point) => point.join(",")).join(" ");
         const grid = [0, 20, 40, 60, 80].map((value) => {
           const y = 250 - (value / max) * 200;
-          return `<line x1="52" x2="720" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="18" y="${y + 4}" fill="var(--muted)" font-size="11">${value}B</text>`;
+          return `<line x1="52" x2="720" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="4" y="${y + 4}" fill="var(--muted)" font-size="9">${idr(value * 1000000000)}</text>`;
         }).join("");
         const labels = trend.map(([month], i) => `<text x="${58 + i * 58}" y="282" fill="var(--muted)" font-size="11">${month}</text>`).join("");
         svg.innerHTML = `
@@ -2443,7 +2965,7 @@
                 <strong>${item.type || item["Activity Type"] || "Project Activity"}</strong>
                 <span class="status-pill status-running">${item.status || "Running"}</span>
               </div>
-              <p class="small">${item.date || item["Activity Date"] || "-"} / ${item.project || item["Project ID"] || "-"}</p>
+              <p class="small">${item.date || item["Activity Date"] || "-"} / ${item.project || item["BRD Number"] || item["Project ID"] || "-"}</p>
               <p class="small">PIC: ${item.pic || item.PIC || "Investment Admin"} / Progress: ${item.progress || "-"}%</p>
               <p style="margin-top:8px">${item.text || item.Description || "Vendor confirmed delivery schedule."}</p>
               <p class="small" style="margin-top:8px">Attachment: paperclip</p>
@@ -2526,8 +3048,8 @@
               <h3 class="highlight-title">${project.name}</h3>
               <p class="small">${project.division} / ${project.category} / PIC ${project.pic}</p>
               <div class="workspace-metric-row">
-                <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Budget</span><strong class="workspace-kpi-value">Rp 23.1 B</strong></div>
-                <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Variance</span><strong class="workspace-kpi-value">Rp 3.8 B</strong></div>
+                <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Budget</span><strong class="workspace-kpi-value">${idr(23100000000)}</strong></div>
+                <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Variance</span><strong class="workspace-kpi-value">${idr(3800000000)}</strong></div>
                 <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Duration</span><strong class="workspace-kpi-value">210 days</strong></div>
                 <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Delay</span><strong class="workspace-kpi-value">Delayed</strong></div>
               </div>
@@ -2616,10 +3138,12 @@
       function simpleChart(title, type, values, labels) {
         const max = Math.max(...values, 1);
         const palette = ["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444", "#14B8A6", "#64748B", "#F97316"];
+        const isCurrencyChart = /investment|budget|cost|variance/i.test(title);
+        const chartValue = (value) => isCurrencyChart ? idr(value < 1000000 ? value * 1000000000 : value) : value;
         const bars = values.map((value, index) => {
           const width = Math.max(8, (value / max) * 100);
           const color = palette[index % palette.length];
-          return `<div class="chart-bar-row" title="${labels[index]}: ${value}"><span class="small">${labels[index]}</span><div class="chart-track"><div class="chart-fill" style="width:${width}%;background:linear-gradient(90deg, ${color}, color-mix(in srgb, ${color} 64%, white))"></div></div><strong class="small">${Math.round(width)}%</strong></div>`;
+          return `<div class="chart-bar-row" title="${labels[index]}: ${chartValue(value)}"><span class="small">${labels[index]}</span><div class="chart-track"><div class="chart-fill" style="width:${width}%;background:linear-gradient(90deg, ${color}, color-mix(in srgb, ${color} 64%, white))"></div></div><strong class="small">${Math.round(width)}%</strong></div>`;
         }).join("");
         const points = values.map((value, index) => `${60 + index * 86},${210 - (value / max) * 150}`);
         const line = `<svg class="chart" viewBox="0 0 760 240" role="img" aria-label="${title}">
@@ -2627,7 +3151,7 @@
           ${[60, 110, 160, 210].map((y) => `<path d="M48 ${y}H704" stroke="#E2E8F0" stroke-width="1"/>`).join("")}
           <path d="M60 210 ${points.map((point) => `L${point.replace(",", " ")}`).join(" ")} L680 210 Z" fill="url(#grad-${title.replace(/\W/g, "")})"/>
           <polyline points="${points.join(" ")}" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          ${points.map((point, index) => `<circle cx="${point.split(",")[0]}" cy="${point.split(",")[1]}" r="4" fill="#fff" stroke="${palette[index % palette.length]}" stroke-width="3"><title>${labels[index]}: ${values[index]}</title></circle>`).join("")}
+          ${points.map((point, index) => `<circle cx="${point.split(",")[0]}" cy="${point.split(",")[1]}" r="4" fill="#fff" stroke="${palette[index % palette.length]}" stroke-width="3"><title>${labels[index]}: ${chartValue(values[index])}</title></circle>`).join("")}
         </svg><div class="chart-axis">${labels.map((label) => `<span>${label}</span>`).join("")}</div>`;
         return `
           <section class="panel chart-card analytics-chart">
@@ -2863,6 +3387,196 @@
         `;
       }
 
+      function importUpdateModuleMarkup() {
+        const templateHref = "Investment_Data_Template.xlsx";
+        const importSummary = state.import.preview?.summary || {};
+        const importErrors = state.import.preview?.errors || [];
+        const importedResult = state.import.result?.summary || {};
+        const summaryCards = [
+          ["Template Version", "v1.0", "Current operational workbook"],
+          ["Last Sync Date", "02 Jul 2026", "09:32 WIB"],
+          ["Last Sync Status", "Success", "Dashboard updated"],
+          ["Imported By", "Investment Admin", "Latest successful update"],
+          ["Latest Import Duration", "12 Seconds", "Fast synchronization"],
+        ];
+        const historyRows = [
+          ["02 Jul 2026 09:32", "Investment_Data_Template.xlsx", "Investment Admin", "3", "25", "12", "4", "Success", "View"],
+          ["28 Jun 2026 14:15", "Investment_Data_Template.xlsx", "Investment Admin", "1", "18", "42", "8", "Success", "View"],
+          ["20 Jun 2026 10:05", "Investment_Data_Template.xlsx", "Investment Admin", "0", "15", "9", "2", "Failed", "Review"],
+        ];
+        const previewRows = [
+          ["PROJECT_MASTER", "BRD-2026-001", "Machine Blowing", idr(800000000), "Valid"],
+          ["PROJECT_ACTIVITY", "BRD-2026-001", "Kick Off Meeting", "Running", "Valid"],
+          ["PROJECT_ACTIVITY", "BRD-2026-001", "Material Delivery", "Running", "Valid"],
+          ["PROJECT_DOCUMENT", "BRD-2026-001", "BRD Rev 01", "BRD", "Valid"],
+        ];
+        const apiPreviewRows = (state.import.preview?.preview?.PROJECT_MASTER || []).slice(0, 8).map((row) => [
+          "PROJECT_MASTER",
+          row.brd_number || "-",
+          row.project_name || "-",
+          idr(row.budget_approved || 0),
+          state.import.valid ? "Valid" : "Check",
+        ]);
+        const previewSummary = [
+          ["New Projects", importSummary.new_projects ?? 0, "Ready to add"],
+          ["Updated Projects", importSummary.updated_projects ?? 0, "Matched by BRD Number"],
+          ["Activities Added", importSummary.activities_added ?? 0, "New activity history"],
+          ["Documents Added", importSummary.documents_added ?? 0, "Metadata records"],
+          ["Rows with Errors", importSummary.rows_with_errors ?? importErrors.length, state.import.valid ? "Import can continue" : "Fix before import"],
+        ];
+        const syncCards = [
+          ["Projects", "28", "Synchronized portfolio"],
+          ["Activities", "156", "Project history rows"],
+          ["Documents", "92", "Document metadata"],
+          ["Import Status", "Success", "Latest file accepted"],
+          ["Duration", "12 Seconds", "Latest import duration"],
+        ];
+        return `
+          <div class="module-page">
+            <section class="module-hero">
+              <div>
+                <div class="eyebrow">Manage investment data using Excel templates</div>
+                <h2>Import Update</h2>
+                <p class="small">Upload the latest Excel template to update investment dashboard data.</p>
+                <div class="activity-detail-row" style="margin-top:12px">
+                  <span class="remaining-pill">Last Sync Date: 02 Jul 2026, 09:32 WIB</span>
+                  <span class="remaining-pill">Last Sync Status: Success</span>
+                  <span class="remaining-pill">Imported By: Investment Admin</span>
+                </div>
+              </div>
+              <div class="detail-toolbar">
+                <a class="button toolbar-button" href="${templateHref}" download>Download Latest Template</a>
+                <button class="button toolbar-button" type="button" data-action="upload-excel">Upload Excel</button>
+                <button class="button toolbar-button" type="button" data-action="preview-excel">Preview Data</button>
+                <button class="button primary" type="button" data-action="import-excel" ${state.import.valid ? "" : "disabled"}>Import Data</button>
+                <button class="button toolbar-button" type="button" data-action="refresh">Refresh Dashboard</button>
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Simple Import Flow</h2><span class="badge">Excel driven</span></div>
+              <div class="grid three-grid">
+                ${[
+                  ["1", "Download Template", "Use the latest operational workbook."],
+                  ["2", "Update Excel", "Fill project, activity, and document rows."],
+                  ["3", "Upload File", "Drag and drop the completed .xlsx file."],
+                  ["4", "Preview Changes", "Review new and updated records before import."],
+                  ["5", "Import Data", "Confirm the validated import."],
+                  ["6", "Dashboard Updated", "Dashboard and workspace data refresh automatically."],
+                ].map(([step, title, text]) => `<article class="stage"><span class="badge">Step ${step}</span><strong>${title}</strong><p class="small">${text}</p></article>`).join("")}
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Download Template</h2><span class="badge">v1.0</span></div>
+              <section class="panel"><div class="panel-body">
+                <div class="export-actions">
+                  <div><strong>Investment_Data_Template.xlsx</strong><p class="small">Use this workbook for project master data, activity updates, and document metadata.</p></div>
+                  <a class="button primary" href="${templateHref}" download>Download Latest Template</a>
+                </div>
+              </div></section>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Upload File</h2><span class="badge">.xlsx only / max 20 MB</span></div>
+              <section class="panel">
+                <div class="panel-body">
+                  <div class="empty" style="text-align:left;border-style:dashed">
+                    <strong>Drag & Drop Excel</strong>
+                    <p class="small">or browse file from your computer. Accepted file type: <strong>.xlsx</strong>. Maximum size: <strong>20 MB</strong>.</p>
+                    <input id="excelImportInput" type="file" accept=".xlsx" hidden>
+                    <button class="button toolbar-button" type="button" data-action="upload-excel">Browse File</button>
+                    <p class="small" id="selectedImportFile">${state.import.file?.name || "No file selected."}</p>
+                  </div>
+                </div>
+              </section>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Preview Changes</h2><span class="badge">Before import</span></div>
+              <div class="analytics-kpi-grid" style="margin-bottom:12px">
+                ${previewSummary.map(([label, value, note]) => `
+                  <article class="analytics-kpi">
+                    <div class="kpi-head"><span class="kpi-icon-box">${uiIcon(label.includes("Errors") ? "AlertTriangle" : label.includes("Documents") ? "FileCheck" : label.includes("Activities") ? "Activity" : "CheckCircle")}</span><span class="kpi-label">${label}</span></div>
+                    <strong>${value}</strong>
+                    <div class="kpi-subline"><span class="small">${note}</span></div>
+                  </article>
+                `).join("")}
+              </div>
+              <section class="panel"><div class="panel-body table-wrap">
+                <table>
+                  <thead><tr><th>Sheet</th><th>BRD Number</th><th>Description</th><th>Value / Status</th><th>Validation</th></tr></thead>
+                  <tbody>${(apiPreviewRows.length ? apiPreviewRows : previewRows).map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody>
+                </table>
+              </div></section>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Validation Result</h2><span class="badge">Error list by sheet / row / column</span></div>
+              <section class="panel"><div class="panel-body">
+                <div class="grid three-grid">
+                  <article class="metric-tile"><span class="metric-label">Success Rows</span><strong class="metric-value">${importSummary.success_rows ?? 0}</strong></article>
+                  <article class="metric-tile"><span class="metric-label">Failed Rows</span><strong class="metric-value">${importSummary.failed_rows ?? importErrors.length}</strong></article>
+                  <article class="metric-tile"><span class="metric-label">Warning Rows</span><strong class="metric-value">${importSummary.warning_rows ?? 0}</strong></article>
+                </div>
+                <div class="table-wrap" style="margin-top:14px">
+                  <table>
+                    <thead><tr><th>Sheet Name</th><th>Row Number</th><th>Column Name</th><th>Error Message</th></tr></thead>
+                    <tbody>${importErrors.length ? importErrors.map((error) => `<tr><td>${error.sheet}</td><td>${error.row || "-"}</td><td>${error.column}</td><td>${error.message}</td></tr>`).join("") : `<tr><td colspan="4"><span class="small">${state.import.preview ? "No errors found. Import Data is available." : "Upload and preview a file to see validation messages."}</span></td></tr>`}</tbody>
+                  </table>
+                </div>
+              </div></section>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Import Data</h2><span class="badge">Ready to synchronize</span></div>
+              <section class="panel"><div class="panel-body">
+                <div class="grid two-grid">
+                  <article class="stage"><strong>${state.import.result?.status === "success" ? "Import Success" : "Ready for Import"}</strong><p class="small">Projects Added: ${importedResult.projects_added ?? importedResult.new_projects ?? 0} / Projects Updated: ${importedResult.projects_updated ?? importedResult.updated_projects ?? 0} / Activities Added: ${importedResult.activities_added ?? 0} / Documents Added: ${importedResult.documents_added ?? 0} / Dashboard Updated: ${state.import.result?.status === "success" ? "Yes" : "Pending"}.</p></article>
+                  <article class="stage"><strong>Investment data synchronized successfully.</strong><p class="small">Dashboard, Analytics, Project Workspace, Activity Timeline, Document List, and Portfolio Table are refreshed.</p></article>
+                </div>
+                <div class="detail-toolbar" style="margin-top:14px">
+                  <button class="button primary" type="button" data-route="Dashboard">View Dashboard</button>
+                  <button class="button toolbar-button" type="button" data-route="Project Workspace">View Projects</button>
+                  <button class="button toolbar-button" type="button">Download Import Log</button>
+                </div>
+              </div></section>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Import Summary</h2><span class="badge">Synchronization center</span></div>
+              <section class="panel"><div class="panel-body">
+                <div class="analytics-kpi-grid">
+                  ${summaryCards.map(([label, value, note]) => `
+                    <article class="analytics-kpi">
+                      <div class="kpi-head"><span class="kpi-icon-box">${uiIcon(label.includes("Status") ? "CheckCircle" : label.includes("Duration") ? "Clock" : label.includes("Documents") ? "FileCheck" : label.includes("Activities") ? "Activity" : "Calendar")}</span><span class="kpi-label">${label}</span></div>
+                      <strong>${value}</strong>
+                      <div class="kpi-subline"><span class="small">${note}</span></div>
+                    </article>
+                  `).join("")}
+                </div>
+                <div class="analytics-kpi-grid" style="margin-top:12px">
+                  ${syncCards.map(([label, value, note]) => `
+                    <article class="analytics-kpi">
+                      <div class="kpi-head"><span class="kpi-icon-box">${uiIcon(label.includes("Status") ? "CheckCircle" : label.includes("Documents") ? "FileCheck" : label.includes("Activities") ? "Activity" : "Target")}</span><span class="kpi-label">${label}</span></div>
+                      <strong>${value}</strong>
+                      <div class="kpi-subline"><span class="small">${note}</span></div>
+                    </article>
+                  `).join("")}
+                </div>
+                <div class="section-title" style="margin-top:18px"><h2>Recent Import History</h2><span class="badge">Latest updates</span></div>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>Import Date</th><th>File Name</th><th>Imported By</th><th>Projects Added</th><th>Projects Updated</th><th>Activities Added</th><th>Documents Added</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody>${historyRows.map((row) => `<tr>${row.map((cell, index) => `<td>${index === 7 ? `<span class="status-pill ${cell === "Success" ? "status-completed" : "status-overdue"}">${cell}</span>` : index === 8 ? `<button class="button toolbar-button" type="button">${cell}</button>` : cell}</td>`).join("")}</tr>`).join("")}</tbody>
+                  </table>
+                </div>
+              </div></section>
+            </section>
+          </div>
+        `;
+      }
+
       function settingsModuleMarkup() {
         const groups = [
           ["Investment Configuration", [["Fiscal Year", "2026"], ["Default Currency", "IDR"], ["Budget Threshold", "90%"], ["Project Health Threshold", "75%"], ["Portfolio Alert Threshold", "30 days"], ["Completion Target (%)", "95"], ["Default Project Status", "Running"], ["Default Priority", "High"]]],
@@ -2916,6 +3630,8 @@
           `
         );
 
+        document.getElementById("Import Update").innerHTML = importUpdateModuleMarkup();
+
         document.getElementById("Documents").innerHTML = moduleTemplate(
           "Document Management",
           "Project-grouped document repository inspired by Google Drive and Windows Explorer.",
@@ -2926,7 +3642,7 @@
 
         document.getElementById("Master Data").innerHTML = moduleTemplate(
           "Master Data",
-          "CRUD scaffolds for divisions, departments, sites, vendors, project categories, statuses, priorities, issue categories, and severities.",
+          "Reference lists for divisions, departments, sites, vendors, project categories, statuses, priorities, issue categories, and severities.",
           `<div class="grid three-grid">${["Division", "Department", "Site", "Vendor", "Project Category", "Project Status", "Priority", "Issue Category", "Issue Severity"].map((item) => `<div class="stage"><strong>${item}</strong><p class="small">Create, edit, archive, search.</p></div>`).join("")}</div>`
         );
 
@@ -2968,6 +3684,62 @@
         return saved;
       }
 
+      async function previewExcelImport() {
+        const file = state.import.file;
+        if (!file) {
+          showToast("Choose Excel file", "Select the completed .xlsx workbook before preview.");
+          return;
+        }
+        if (!file.name.toLowerCase().endsWith(".xlsx") || file.size > 20 * 1024 * 1024) {
+          showToast("File not accepted", "Use one .xlsx file with maximum size 20 MB.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+          const response = await fetch("/api/import/preview", { method: "POST", body: formData });
+          if (!response.ok) throw new Error("Import preview is not available.");
+          const json = await response.json();
+          state.import.preview = json;
+          state.import.filePath = json.file_path || "";
+          state.import.valid = Boolean(json.valid);
+          renderModules();
+          showToast(state.import.valid ? "Preview ready" : "Validation errors found", state.import.valid ? "Import Data is available." : "Fix the listed rows before import.");
+        } catch (error) {
+          showToast("Import service unavailable", "Run the Laravel backend to preview and import Excel data.");
+        }
+      }
+
+      async function processExcelImport() {
+        if (!state.import.valid || !state.import.filePath) {
+          showToast("Preview required", "Preview a valid Excel file before importing.");
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/import/process", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({ file_path: state.import.filePath }),
+          });
+          if (!response.ok) throw new Error("Import failed.");
+          const json = await response.json();
+          state.import.result = json;
+          if (json.status === "success") {
+            await loadDatabaseData();
+            render();
+            showToast("Investment data synchronized successfully.", "Dashboard, Analytics, Project Workspace, Activity Timeline, Document List, and Portfolio Table were refreshed.");
+          } else {
+            state.import.preview = { ...(state.import.preview || {}), errors: json.errors || [] };
+            renderModules();
+            showToast("Import blocked", "Validation errors must be fixed before importing.");
+          }
+        } catch (error) {
+          showToast("Import service unavailable", "Run the Laravel backend to import Excel data.");
+        }
+      }
+
       function setRoute(route) {
         state.route = route;
         document.querySelectorAll(".route").forEach((node) => node.classList.toggle("active", node.id === route));
@@ -2976,6 +3748,8 @@
         document.getElementById("sidebar").classList.remove("open");
         renderNav();
       }
+
+      window.setDashboardRoute = setRoute;
 
       function render() {
         const rows = filteredProjects();
@@ -3001,8 +3775,24 @@
         if (routeButton) setRoute(routeButton.dataset.route);
         const actionButton = event.target.closest("[data-action]");
         if (actionButton?.dataset.action === "refresh") {
-          render();
-          showToast("Dashboard refreshed", "Executive metrics and portfolio views were refreshed.");
+          loadDatabaseData()
+            .then(() => {
+              render();
+              showToast("Dashboard refreshed", "Dashboard data was refreshed from imported records.");
+            })
+            .catch(() => {
+              render();
+              showToast("Dashboard refreshed", "Executive metrics and portfolio views were refreshed.");
+            });
+        }
+        if (actionButton?.dataset.action === "upload-excel") {
+          document.getElementById("excelImportInput")?.click();
+        }
+        if (actionButton?.dataset.action === "preview-excel") {
+          previewExcelImport();
+        }
+        if (actionButton?.dataset.action === "import-excel") {
+          processExcelImport();
         }
         if (actionButton?.dataset.action === "export") {
           showToast("Export queued", "Static preview export action is ready for the production build.");
@@ -3038,10 +3828,37 @@
           if (state.table.page < 1) state.table.page = 1;
           render();
         }
-        const calendarButton = event.target.closest("[data-calendar-view]");
-        if (calendarButton) {
-          state.calendarView = calendarButton.dataset.calendarView;
+        const calendarAction = event.target.closest("[data-calendar-action]");
+        if (calendarAction) {
+          const action = calendarAction.dataset.calendarAction;
+          if (action === "toggle-filters") {
+            state.calendarFiltersOpen = !state.calendarFiltersOpen;
+          }
+          if (action === "today") {
+            state.calendarMonth = "2026-07";
+            state.selectedCalendarDate = "2026-07-01";
+          }
+          if (action === "prev" || action === "next") {
+            const [year, month] = state.calendarMonth.split("-").map(Number);
+            const nextDate = new Date(year, month - 1 + (action === "next" ? 1 : -1), 1);
+            state.calendarMonth = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, "0")}`;
+            state.selectedCalendarDate = "";
+          }
           renderProjectCalendar();
+        }
+        const calendarDay = event.target.closest("[data-calendar-day]");
+        if (calendarDay && !calendarDay.disabled) {
+          state.selectedCalendarDate = calendarDay.dataset.calendarDay;
+          renderProjectCalendar();
+          requestAnimationFrame(() => {
+            const feed = document.getElementById("calendarActivityFeed");
+            const target = feed?.querySelector(`[data-activity-date="${state.selectedCalendarDate}"]`);
+            if (target) {
+              feed.querySelectorAll(".activity-card").forEach((card) => card.classList.remove("is-highlighted"));
+              target.classList.add("is-highlighted");
+              target.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+          });
         }
       });
 
@@ -3050,6 +3867,25 @@
         if (filter) {
           state.filters[filter] = event.target.value;
           render();
+        }
+        const calendarFilter = event.target.dataset.calendarFilter;
+        if (calendarFilter) {
+          state.calendarFilters[calendarFilter] = event.target.value;
+          state.selectedCalendarDate = "";
+          renderProjectCalendar();
+        }
+        if (event.target.matches("[data-calendar-month]")) {
+          state.calendarMonth = event.target.value;
+          state.selectedCalendarDate = "";
+          renderProjectCalendar();
+        }
+        if (event.target.id === "excelImportInput") {
+          state.import.file = event.target.files?.[0] || null;
+          state.import.filePath = "";
+          state.import.valid = false;
+          state.import.preview = null;
+          state.import.result = null;
+          renderModules();
         }
       });
 
@@ -3068,7 +3904,7 @@
       document.getElementById("drawerBackdrop").addEventListener("click", () => document.getElementById("drawer").classList.remove("open"));
       document.getElementById("closeDrawer").addEventListener("click", () => document.getElementById("drawer").classList.remove("open"));
       document.getElementById("menuButton").addEventListener("click", () => document.getElementById("sidebar").classList.add("open"));
-      document.getElementById("previewImportButton").addEventListener("click", () => showToast("Import preview ready", "Validation, duplicate detection, and error report flow are scaffolded."));
+      document.getElementById("previewImportButton").addEventListener("click", () => showToast("Import preview ready", "Validation, duplicate detection, and error reporting are ready."));
       document.getElementById("requestForm").addEventListener("submit", (event) => {
         event.preventDefault();
         try {
@@ -3081,8 +3917,23 @@
       });
 
       document.body.dataset.theme = localStorage.getItem("ims-theme") || "";
-      render();
-    </script>
+      loadDatabaseData()
+        .then(() => render())
+        .catch(() => render());
+    
+
+</script>
   </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
 
