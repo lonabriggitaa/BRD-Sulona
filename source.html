@@ -1,0 +1,3088 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enterprise Investment Portfolio Management System</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-2: #eef3f8;
+        --ink: #162033;
+        --muted: #64748b;
+        --line: #d9e2ec;
+        --primary: #0F172A;
+        --primary-2: #1E293B;
+        --teal: #10B981;
+        --green: #10B981;
+        --amber: #F59E0B;
+        --red: #be123c;
+        --violet: #6d28d9;
+        --shadow: 0 18px 46px rgba(22, 32, 51, 0.08);
+      }
+
+      [data-theme="dark"] {
+        color-scheme: dark;
+        --bg: #101827;
+        --surface: #162235;
+        --surface-2: #1f2b3d;
+        --ink: #eef4ff;
+        --muted: #a8b6c8;
+        --line: #2b3a51;
+        --primary: #60a5fa;
+        --primary-2: #3b82f6;
+        --teal: #2dd4bf;
+        --green: #4ade80;
+        --amber: #fbbf24;
+        --red: #fb7185;
+        --violet: #a78bfa;
+        --shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 14px;
+        overflow-x: hidden;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app-shell {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+        border-right: 1px solid var(--line);
+        background: var(--surface);
+        padding: 20px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #173b78;
+        color: white;
+        font-weight: 800;
+      }
+
+      .brand strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .brand span,
+      .eyebrow,
+      .muted {
+        color: var(--muted);
+      }
+
+      .nav-section {
+        margin: 18px 0 8px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .nav-button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 42px;
+        margin: 4px 0;
+        padding: 10px 12px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--muted);
+        text-align: left;
+      }
+
+      .nav-button svg {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+      }
+
+      .nav-button.active,
+      .nav-button:hover {
+        border-color: color-mix(in srgb, var(--primary) 24%, transparent);
+        background: color-mix(in srgb, var(--primary) 10%, transparent);
+        color: var(--primary-2);
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--line);
+      }
+
+      .dot.done {
+        background: var(--green);
+      }
+
+      .dot.now {
+        background: var(--primary);
+      }
+
+      .main {
+        min-width: 0;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 72px;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
+        padding: 14px 26px;
+        backdrop-filter: blur(14px);
+      }
+
+      .mobile-menu {
+        display: none;
+      }
+
+      .breadcrumbs {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        margin-top: 4px;
+        font-size: 25px;
+        line-height: 1.2;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      h3 {
+        font-size: 14px;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: min(340px, 35vw);
+        height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 0 12px;
+      }
+
+      .search input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--ink);
+      }
+
+      .icon-button,
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--surface);
+        color: var(--ink);
+        padding: 0 12px;
+        font-weight: 700;
+      }
+
+      .icon-button {
+        width: 40px;
+        padding: 0;
+      }
+
+      .button.primary {
+        border-color: var(--primary-2);
+        background: var(--primary-2);
+        color: white;
+      }
+
+      .project-workspace-cta {
+        border-color: #334155;
+        background: #334155;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+        transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease;
+      }
+
+      .project-workspace-cta:hover {
+        transform: translateY(-1px);
+        border-color: #475569;
+        background: #475569;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+      }
+
+      .project-workspace-cta svg {
+        width: 14px;
+        height: 14px;
+        max-width: 14px;
+        max-height: 14px;
+        stroke-width: 1.35;
+      }
+
+      .content {
+        padding: 24px 26px 42px;
+      }
+
+      .filter-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+        padding: 10px 12px;
+      }
+
+      .toolbar-left,
+      .toolbar-actions,
+      .filter-controls,
+      .filter-chips {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .toolbar-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 34px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .compact-filter {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        padding: 0 10px;
+      }
+
+      .compact-filter span {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .compact-filter select {
+        min-width: 92px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .toolbar-button {
+        min-height: 34px;
+        padding: 0 10px;
+        font-size: 12px;
+      }
+
+      .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--primary) 8%, transparent);
+        color: var(--primary-2);
+        padding: 0 9px;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .field select,
+      .field input,
+      .field textarea {
+        width: 100%;
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--surface);
+        color: var(--ink);
+        padding: 8px 10px;
+        outline: 0;
+      }
+
+      .field textarea {
+        min-height: 78px;
+        resize: vertical;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--surface);
+        box-shadow: 0 14px 36px rgba(15, 23, 42, 0.07);
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        overflow: hidden;
+      }
+
+      .panel:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 20px 46px rgba(15, 23, 42, 0.1);
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .panel-body {
+        padding: 16px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid > *,
+      .panel,
+      .main,
+      .content {
+        min-width: 0;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .analytics-grid {
+        grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+      }
+
+      .three-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .two-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .kpi {
+        position: relative;
+        overflow: hidden;
+        padding: 18px;
+      }
+
+      .kpi::after {
+        content: "";
+        position: absolute;
+        inset: auto -28px -34px auto;
+        width: 110px;
+        height: 110px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--primary) 8%, transparent);
+      }
+
+      .kpi-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .kpi-value {
+        margin-top: 10px;
+        color: var(--ink);
+        font-size: 28px;
+        font-weight: 800;
+      }
+
+      .kpi-note {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .trend svg {
+        width: 14px;
+        height: 14px;
+        max-width: 14px;
+        max-height: 14px;
+      }
+
+      .trend.good {
+        color: var(--green);
+      }
+
+      .trend.warn {
+        color: var(--amber);
+      }
+
+      .trend.bad {
+        color: var(--red);
+      }
+
+      .chart {
+        width: 100%;
+        min-height: 280px;
+      }
+
+      .dashboard-section {
+        margin-top: 22px;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+
+      .section-title h2 {
+        font-size: 20px;
+      }
+
+      .hero-summary {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 20px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background:
+          linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.92)),
+          var(--primary);
+        color: white;
+        box-shadow: 0 22px 56px rgba(15, 23, 42, 0.18);
+        padding: 24px;
+      }
+
+      .hero-summary h2 {
+        margin: 6px 0;
+        font-size: 30px;
+      }
+
+      .hero-summary p,
+      .hero-meta {
+        color: rgba(255, 255, 255, 0.74);
+      }
+
+      .hero-meta,
+      .quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .hero-meta span,
+      .quick-actions button {
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .quick-actions {
+        margin-top: 16px;
+      }
+
+      .quick-actions button {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 36px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      .quick-actions button:hover {
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .health-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .health-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 128px;
+        padding: 20px;
+        cursor: pointer;
+      }
+
+      .health-card strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 30px;
+      }
+
+      .health-icon {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        color: white;
+        font-weight: 900;
+      }
+
+      .analytics-dashboard-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .chart-card {
+        min-height: 360px;
+      }
+
+      .chart-card .panel-body {
+        min-height: 282px;
+      }
+
+      .highlight-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+        gap: 22px;
+        padding: 22px;
+      }
+
+      .highlight-title {
+        font-size: 24px;
+        margin: 6px 0 12px;
+      }
+
+      .metric-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .metric-tile {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--surface);
+        box-shadow: var(--shadow-soft);
+        padding: 16px;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .metric-tile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1);
+      }
+
+      .metric-tile > .small {
+        display: block;
+        margin-bottom: 8px;
+        color: #64748B;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .metric-tile > strong {
+        display: block;
+        color: #0F172A;
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+      }
+
+      .highlight-metric {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        align-content: center;
+        gap: 7px;
+        min-height: 118px;
+        padding: 16px;
+        text-align: center;
+      }
+
+      .metric-icon-box {
+        display: inline-grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--primary) 9%, transparent);
+        color: var(--primary);
+      }
+
+      .metric-icon-box svg {
+        width: 18px;
+        height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+      }
+
+      .metric-label {
+        display: block;
+        color: #64748B;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+
+      .metric-value {
+        display: block;
+        margin-top: 3px;
+        color: #0F172A;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.15;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .workspace-metric-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .workspace-kpi-tile {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 76px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--surface);
+        box-shadow: var(--shadow-soft);
+        padding: 12px 14px;
+      }
+
+      .workspace-kpi-label {
+        display: block;
+        margin-bottom: 4px;
+        color: #64748B;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: 0;
+        white-space: nowrap;
+      }
+
+      .workspace-kpi-value {
+        display: block;
+        white-space: nowrap;
+        color: #0F172A;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: 0;
+      }
+
+      .activity-feed {
+        position: relative;
+        display: grid;
+        gap: 14px;
+      }
+
+      .activity-card {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--surface);
+        padding: 14px;
+      }
+
+      .activity-dot {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--primary) 9%, transparent);
+        color: var(--primary);
+      }
+
+      .activity-dot svg {
+        width: 20px;
+        height: 20px;
+        max-width: 20px;
+        max-height: 20px;
+      }
+
+      .health-icon svg {
+        width: 20px;
+        height: 20px;
+        max-width: 20px;
+        max-height: 20px;
+      }
+
+      .folder-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .folder-card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--surface);
+        overflow: hidden;
+      }
+
+      .folder-head {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 12px;
+        align-items: center;
+        padding: 14px 16px;
+        background: var(--surface-2);
+      }
+
+      .doc-grid {
+        display: grid;
+        gap: 8px;
+        padding: 12px 16px 16px;
+      }
+
+      .doc-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto auto auto;
+        gap: 10px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px;
+      }
+
+      .calendar-widget {
+        display: grid;
+        grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+        gap: 16px;
+      }
+
+      .calendar-tabs {
+        display: inline-flex;
+        gap: 6px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface-2);
+        padding: 4px;
+      }
+
+      .calendar-tabs button {
+        min-height: 30px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--muted);
+        padding: 0 12px;
+        font-weight: 800;
+      }
+
+      .calendar-tabs button.active {
+        background: var(--surface);
+        color: var(--primary);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+      }
+
+      .mini-calendar {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .calendar-day {
+        min-height: 42px;
+        border-radius: 10px;
+        background: var(--surface-2);
+        color: var(--muted);
+        padding: 6px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .calendar-day.has-item {
+        background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+        color: var(--ink);
+      }
+
+      .agenda-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .agenda-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--surface);
+        padding: 12px;
+      }
+
+      .agenda-date {
+        display: grid;
+        place-items: center;
+        min-width: 54px;
+        min-height: 54px;
+        border-radius: 14px;
+        background: var(--surface-2);
+        font-weight: 900;
+      }
+
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+
+      .bar-row {
+        display: grid;
+        grid-template-columns: 110px 1fr 52px;
+        gap: 10px;
+        align-items: center;
+        margin: 12px 0;
+      }
+
+      .bar-track {
+        height: 10px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        overflow: hidden;
+      }
+
+      .bar {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--primary);
+      }
+
+      .status-pill,
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 24px;
+        border-radius: 999px;
+        padding: 3px 9px;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .badge {
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        color: var(--muted);
+      }
+
+      .status-running {
+        background: color-mix(in srgb, var(--primary) 14%, transparent);
+        color: var(--primary-2);
+      }
+
+      .status-completed {
+        background: color-mix(in srgb, var(--green) 16%, transparent);
+        color: var(--green);
+      }
+
+      .status-pending,
+      .status-review {
+        background: color-mix(in srgb, var(--amber) 18%, transparent);
+        color: var(--amber);
+      }
+
+      .status-overdue,
+      .status-critical {
+        background: color-mix(in srgb, var(--red) 15%, transparent);
+        color: var(--red);
+      }
+
+      .table-wrap {
+        max-width: 100%;
+        overflow: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 880px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      th {
+        position: sticky;
+        top: 0;
+        background: var(--surface);
+        color: var(--muted);
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      tbody tr:hover {
+        background: color-mix(in srgb, var(--primary) 6%, transparent);
+      }
+
+      .progress {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .progress-track {
+        width: 92px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--teal);
+      }
+
+      .timeline {
+        display: grid;
+        gap: 12px;
+      }
+
+      .timeline-item {
+        display: grid;
+        grid-template-columns: 18px 1fr;
+        gap: 10px;
+      }
+
+      .timeline-node {
+        width: 12px;
+        height: 12px;
+        margin-top: 4px;
+        border: 3px solid color-mix(in srgb, var(--primary) 30%, transparent);
+        border-radius: 999px;
+        background: var(--primary);
+      }
+
+      .timeline-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-2);
+        padding: 12px;
+      }
+
+      .timeline-card p,
+      .small {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(120px, 1fr));
+        gap: 10px;
+        overflow: auto;
+        padding-bottom: 4px;
+      }
+
+      .stage {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 12px;
+        min-height: 94px;
+      }
+
+      .stage strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .module-grid {
+        grid-template-columns: 0.92fr 1.08fr;
+        align-items: start;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .empty {
+        display: grid;
+        place-items: center;
+        min-height: 220px;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        background: var(--surface-2);
+        color: var(--muted);
+        text-align: center;
+        padding: 24px;
+      }
+
+      .toast {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 40;
+        display: none;
+        max-width: 360px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        padding: 13px 14px;
+      }
+
+      .toast.show {
+        display: block;
+      }
+
+      .drawer {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        display: none;
+      }
+
+      .drawer.open {
+        display: block;
+      }
+
+      .drawer-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+      }
+
+      .drawer-panel {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: min(560px, 92vw);
+        height: 100%;
+        overflow: auto;
+        border-left: 1px solid var(--line);
+        background: var(--surface);
+        padding: 22px;
+      }
+
+      .skeleton {
+        overflow: hidden;
+        position: relative;
+        background: var(--surface-2);
+      }
+
+      .skeleton::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
+        animation: shimmer 1.5s infinite;
+      }
+
+      .analytics-page,
+      .settings-page {
+        display: grid;
+        gap: 22px;
+      }
+
+      .module-hero {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: flex-start;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: linear-gradient(135deg, #ffffff, #f8fafc);
+        box-shadow: var(--shadow-soft);
+        padding: 22px;
+      }
+
+      .module-hero h2 {
+        margin: 6px 0 8px;
+        font-size: 28px;
+      }
+
+      .insight-grid,
+      .watchlist-grid,
+      .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .analytics-kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .analytics-chart-grid,
+      .ranking-grid,
+      .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .insight-card,
+      .analytics-kpi,
+      .watch-card,
+      .ranking-card,
+      .heatmap-card,
+      .config-card,
+      .export-card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--surface);
+        box-shadow: var(--shadow-soft);
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .insight-card:hover,
+      .analytics-kpi:hover,
+      .watch-card:hover,
+      .ranking-card:hover,
+      .heatmap-card:hover,
+      .config-card:hover,
+      .export-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 44px rgba(15, 23, 42, 0.1);
+      }
+
+      .insight-card,
+      .analytics-kpi,
+      .watch-card,
+      .config-card,
+      .export-card {
+        padding: 14px;
+      }
+
+      .analytics-kpi {
+        display: grid;
+        align-content: start;
+        gap: 9px;
+        min-height: 176px;
+        max-height: 200px;
+        overflow: hidden;
+      }
+
+      .kpi-head {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+      }
+
+      .kpi-icon-box {
+        display: inline-grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--primary) 10%, transparent);
+        color: var(--primary);
+        overflow: hidden;
+      }
+
+      .kpi-icon-box svg {
+        width: 20px;
+        height: 20px;
+        max-width: 20px;
+        max-height: 20px;
+        display: block;
+        flex: 0 0 20px;
+      }
+
+      .kpi-label {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .kpi-subline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .insight-top,
+      .watch-top,
+      .config-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .insight-top > svg,
+      .watch-top > svg {
+        width: 20px;
+        height: 20px;
+        max-width: 20px;
+        max-height: 20px;
+        flex: 0 0 20px;
+        color: var(--primary);
+      }
+
+      .analytics-kpi strong {
+        display: block;
+        margin-top: 2px;
+        color: var(--ink);
+        font-size: 22px;
+        line-height: 1.15;
+      }
+
+      .mini-spark {
+        width: 100%;
+        height: 30px;
+        margin-top: 2px;
+      }
+
+      .analytics-chart {
+        min-height: 360px;
+      }
+
+      .analytics-chart .panel-body {
+        min-height: 286px;
+      }
+
+      .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .legend-dot {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        margin-right: 6px;
+        border-radius: 999px;
+        background: var(--primary);
+      }
+
+      .chart-axis {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .chart-bar-list {
+        display: grid;
+        gap: 13px;
+      }
+
+      .chart-bar-row {
+        display: grid;
+        grid-template-columns: minmax(92px, 132px) 1fr minmax(48px, auto);
+        gap: 12px;
+        align-items: center;
+      }
+
+      .chart-track {
+        height: 12px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(148, 163, 184, .16), rgba(148, 163, 184, .08));
+      }
+
+      .chart-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #3b82f6, #10b981);
+        transition: width 420ms ease;
+      }
+
+      .analytics-chart svg.chart {
+        width: 100%;
+        height: 220px;
+        overflow: visible;
+      }
+
+      .watch-count {
+        margin: 10px 0 2px;
+        color: var(--ink);
+        font-size: 30px;
+        font-weight: 900;
+      }
+
+      .ranking-card {
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .ranking-card summary {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 15px 16px;
+        font-weight: 800;
+      }
+
+      .ranking-list {
+        display: grid;
+        gap: 10px;
+        padding: 0 16px 16px;
+      }
+
+      .ranking-row,
+      .config-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .rank-number {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .heatmap-card {
+        padding: 16px;
+      }
+
+      .heatmap-cells {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .heatmap-cell {
+        position: relative;
+        min-height: 108px;
+        border-radius: 10px;
+        padding: 12px;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 10px 24px rgba(15,23,42,.08);
+        transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+      }
+
+      .heatmap-cell:hover {
+        transform: translateY(-2px);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 18px 34px rgba(15,23,42,.14);
+        filter: saturate(1.03);
+      }
+
+      .heatmap-cell .small {
+        color: rgba(255,255,255,.82);
+      }
+
+      .heatmap-cell::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: calc(100% + 8px);
+        z-index: 5;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(4px);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #0f172a;
+        color: white;
+        padding: 8px 10px;
+        font-size: 11px;
+        line-height: 1.35;
+        box-shadow: var(--shadow);
+        transition: opacity 140ms ease, transform 140ms ease;
+      }
+
+      .heatmap-cell:hover::after {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .detail-toolbar,
+      .export-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .config-card {
+        display: grid;
+        gap: 12px;
+      }
+
+      .config-row {
+        grid-template-columns: 1fr minmax(130px, 190px);
+      }
+
+      .config-row input,
+      .config-row select {
+        width: 100%;
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--ink);
+        padding: 0 10px;
+      }
+
+      @keyframes shimmer {
+        to {
+          transform: translateX(100%);
+        }
+      }
+
+      .route {
+        display: none;
+      }
+
+      .route.active {
+        display: block;
+      }
+
+      @media (max-width: 1180px) {
+        .kpi-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .analytics-kpi-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .analytics-grid,
+        .analytics-chart-grid,
+        .insight-grid,
+        .watchlist-grid,
+        .ranking-grid,
+        .heatmap-grid,
+        .settings-grid,
+        .module-grid,
+        .two-grid,
+        .calendar-widget {
+          grid-template-columns: 1fr;
+        }
+
+        .filter-toolbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .toolbar-left,
+        .filter-controls,
+        .toolbar-actions {
+          flex-wrap: wrap;
+        }
+
+        .metric-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .workspace-metric-row {
+          grid-template-columns: repeat(2, minmax(160px, 1fr));
+        }
+      }
+
+      @media (max-width: 820px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: fixed;
+          inset: 0 auto 0 0;
+          z-index: 50;
+          width: 280px;
+          transform: translateX(-100%);
+          transition: transform 180ms ease;
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .mobile-menu {
+          display: inline-flex;
+        }
+
+        .topbar {
+          align-items: flex-start;
+          padding: 14px 16px;
+        }
+
+        .top-actions {
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
+        .search {
+          order: 5;
+          width: 100%;
+        }
+
+        .content {
+          padding: 18px 16px 36px;
+        }
+
+        .kpi-grid,
+        .analytics-kpi-grid,
+        .metric-row,
+        .workspace-metric-row,
+        .three-grid,
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 21px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark">IP</div>
+          <div>
+            <strong>Investment Portfolio</strong>
+            <span>Management System</span>
+          </div>
+        </div>
+
+        <div class="nav-section">Main Menu</div>
+        <nav id="navigation"></nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div style="display: flex; gap: 12px; align-items: flex-start">
+            <button class="icon-button mobile-menu" id="menuButton" title="Open navigation" aria-label="Open navigation">
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <div>
+              <div class="breadcrumbs" id="breadcrumbs">Home / Dashboard</div>
+              <h1 id="pageTitle">Portfolio Command Center</h1>
+            </div>
+          </div>
+          <div class="top-actions">
+            <span class="badge">FY 2026</span>
+            <label class="search" title="Search projects, vendors, PIC, and BRD numbers">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input id="globalSearch" placeholder="Search project, BRD, vendor..." />
+            </label>
+            <button class="icon-button" title="Notifications" aria-label="Notifications">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+            </button>
+            <button class="icon-button" id="themeButton" title="Toggle dark mode" aria-label="Toggle dark mode">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a7 7 0 1 0 9 9 9 9 0 0 1-9-9Z"/></svg>
+            </button>
+            <button class="button" id="exportButton">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+              Export
+            </button>
+          </div>
+        </header>
+
+        <section class="content">
+          <section class="filter-toolbar" id="filters"></section>
+
+          <section id="Dashboard" class="route active">
+            <section class="hero-summary">
+              <div>
+                <div class="eyebrow">Executive Investment Portfolio Dashboard</div>
+                <h2>Portfolio Command Center</h2>
+                <p>Monitor investment value, execution health, project delivery, and operational activity from request to closing.</p>
+                <div class="hero-meta" id="dashboardMeta"></div>
+                <div class="quick-actions">
+                  <button type="button" data-action="new-investment">+ New Investment</button>
+                  <button type="button" data-action="upload-document">Upload Document</button>
+                  <button type="button" data-action="generate-report">Generate Report</button>
+                  <button type="button" data-action="export">Export Dashboard</button>
+                  <button type="button" data-action="refresh">Refresh Dashboard</button>
+                </div>
+              </div>
+              <div style="min-width:220px;text-align:right">
+                <div class="small" style="color:rgba(255,255,255,.72)">Current Portfolio</div>
+                <div style="font-size:42px;font-weight:900" id="heroInvestment">Rp 0 B</div>
+                <div class="badge" style="background:rgba(255,255,255,.12);color:white;border-color:rgba(255,255,255,.18)">Executive View</div>
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title">
+                <div>
+                  <h2>Executive Summary</h2>
+                  <p class="small">Headline metrics with movement against the previous month.</p>
+                </div>
+              </div>
+              <div class="grid kpi-grid" id="kpis"></div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title">
+                <div>
+                  <h2>Portfolio Health</h2>
+                  <p class="small">Click a health category to filter the portfolio table.</p>
+                </div>
+              </div>
+              <div class="grid health-grid" id="healthCards"></div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title">
+                <div>
+                  <h2>Project Calendar</h2>
+                  <p class="small">Upcoming milestones, key deadlines, planned meetings, and completion targets.</p>
+                </div>
+                <div class="calendar-tabs" id="calendarTabs">
+                  <button type="button" class="active" data-calendar-view="month">Month</button>
+                  <button type="button" data-calendar-view="agenda">Agenda</button>
+                </div>
+              </div>
+              <section class="panel">
+                <div class="panel-body calendar-widget" id="projectCalendar"></div>
+              </section>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title">
+                <div>
+                  <h2>Investment Analytics</h2>
+                  <p class="small">Power BI-style views for investment value, budget movement, allocation, and completion.</p>
+                </div>
+                <span class="badge">Responsive analytics grid</span>
+              </div>
+              <div class="grid analytics-dashboard-grid">
+                <section class="panel chart-card">
+                  <div class="panel-header"><h2>Investment Trend</h2><span class="badge">Line</span></div>
+                  <div class="panel-body"><svg class="chart" id="lineChart" viewBox="0 0 760 300" role="img" aria-label="Investment trend line chart"></svg></div>
+                </section>
+                <section class="panel chart-card">
+                  <div class="panel-header"><h2>Budget vs Actual</h2><span class="badge">Bar</span></div>
+                  <div class="panel-body" id="budgetBars"></div>
+                </section>
+                <section class="panel chart-card">
+                  <div class="panel-header"><h2>Investment by Division</h2><span class="badge">Horizontal</span></div>
+                  <div class="panel-body" id="divisionBars"></div>
+                </section>
+                <section class="panel chart-card">
+                  <div class="panel-header"><h2>Investment by Category</h2><span class="badge">Donut</span></div>
+                  <div class="panel-body" id="categoryDonut"></div>
+                </section>
+                <section class="panel chart-card">
+                  <div class="panel-header"><h2>Project Status</h2><span class="badge">Donut</span></div>
+                  <div class="panel-body" id="statusDonut"></div>
+                </section>
+                <section class="panel chart-card">
+                  <div class="panel-header"><h2>Monthly Completion Trend</h2><span class="badge">Area</span></div>
+                  <div class="panel-body"><svg class="chart" id="completionArea" viewBox="0 0 760 300" role="img" aria-label="Monthly completion area chart"></svg></div>
+                </section>
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title">
+                <div>
+                  <h2>Project Performance</h2>
+                  <p class="small">Featured project selected by highest approved budget or closest delivery risk.</p>
+                </div>
+              </div>
+              <section class="panel highlight-card" id="projectHighlight"></section>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title">
+                <div>
+                  <h2>Recent Activities</h2>
+                  <p class="small">Daily project journal, newest first, in Jira-style activity cards.</p>
+                </div>
+              </div>
+              <section class="panel"><div class="panel-body activity-feed" id="activityList"></div></section>
+            </section>
+
+            <section class="panel dashboard-section">
+              <div class="panel-header">
+                <div>
+                  <h2>Portfolio Table</h2>
+                  <p class="small">Sortable portfolio control grid with progress, health, latest activity, and action entry points.</p>
+                </div>
+                <span class="badge" id="projectCount">0 records</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th data-sort="name">Project</th>
+                      <th data-sort="division">Division</th>
+                      <th data-sort="vendor">Vendor</th>
+                      <th data-sort="pic">PIC</th>
+                      <th data-sort="approved">Budget</th>
+                      <th data-sort="progress">Progress</th>
+                      <th>Health</th>
+                      <th data-sort="status">Status</th>
+                      <th>Last Activity</th>
+                      <th data-sort="finish">Last Updated</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="projectTable"></tbody>
+                </table>
+              </div>
+              <div class="pagination" id="tablePager"></div>
+            </section>
+          </section>
+
+          <section id="Investment Request" class="route"></section>
+          <section id="Project Workspace" class="route"></section>
+          <section id="Documents" class="route"></section>
+          <section id="Analytics" class="route"></section>
+          <section id="Master Data" class="route"></section>
+          <section id="Settings" class="route"></section>
+        </section>
+      </main>
+    </div>
+
+    <div class="drawer" id="drawer" aria-hidden="true">
+      <div class="drawer-backdrop" id="drawerBackdrop"></div>
+      <aside class="drawer-panel">
+        <div class="panel-header" style="padding: 0 0 16px; margin-bottom: 16px">
+          <div>
+            <div class="eyebrow">Investment Request</div>
+            <h2>Register Approved BRD</h2>
+          </div>
+          <button class="icon-button" id="closeDrawer" title="Close form" aria-label="Close form">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <form class="form-grid" id="requestForm">
+          <div class="field"><label>BRD Number</label><input name="brd" required value="BRD-26013" /></div>
+          <div class="field"><label>Project Name</label><input name="name" required placeholder="Investment project name" /></div>
+          <div class="field"><label>Division</label><select name="division"><option>Supply Chain</option><option>Finance</option><option>Operations</option><option>Manufacturing</option></select></div>
+          <div class="field"><label>Department</label><input name="department" placeholder="Department" /></div>
+          <div class="field"><label>Site</label><select name="site"><option>Jakarta</option><option>Bandung</option><option>Surabaya</option><option>Medan</option><option>Makassar</option></select></div>
+          <div class="field"><label>Priority</label><select name="priority"><option>High</option><option>Medium</option><option>Low</option></select></div>
+          <div class="field"><label>Budget Requested</label><input name="budget" value="12500000000" /></div>
+          <div class="field"><label>Vendor</label><input name="vendor" placeholder="Vendor candidate" /></div>
+          <div class="field"><label>Planned Start</label><input name="start" type="date" value="2026-07-15" /></div>
+          <div class="field"><label>Planned Finish</label><input name="finish" type="date" value="2027-01-30" /></div>
+          <div class="field" style="grid-column: 1 / -1"><label>Business Justification</label><textarea name="objective" placeholder="Operational, financial, and strategic justification"></textarea></div>
+          <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px">
+            <button type="button" class="button" id="previewImportButton">Preview Import</button>
+            <button type="submit" class="button primary">Save Draft</button>
+          </div>
+        </form>
+      </aside>
+    </div>
+
+    <div class="toast" id="toast">
+      <strong id="toastTitle">Saved</strong>
+      <p class="small" id="toastText">Action completed.</p>
+    </div>
+
+    <script>
+      let projects = [
+        { brd: "BRD-26001", name: "Warehouse Automation Line", division: "Supply Chain", department: "Warehouse", site: "Jakarta", category: "Automation", priority: "High", status: "Running", health: "Yellow", pic: "Ari Wibowo", vendor: "Siemens", budget: 20000000000, approved: 18500000000, actual: 13600000000, progress: 68, start: "2026-01-10", finish: "2026-09-30", approvalDays: 18 },
+        { brd: "BRD-26002", name: "ERP Finance Extension", division: "Finance", department: "Accounting", site: "Bandung", category: "IT System", priority: "High", status: "Under Review", health: "Green", pic: "Dina Putri", vendor: "SAP Partner Indonesia", budget: 9500000000, approved: 9200000000, actual: 2100000000, progress: 22, start: "2026-03-01", finish: "2026-12-15", approvalDays: 31 },
+        { brd: "BRD-26003", name: "Solar Rooftop Phase 2", division: "Operations", department: "Utility", site: "Surabaya", category: "Energy", priority: "Medium", status: "Completed", health: "Green", pic: "Raka Santoso", vendor: "Schneider Electric", budget: 14500000000, approved: 14200000000, actual: 13900000000, progress: 100, start: "2025-08-20", finish: "2026-04-10", approvalDays: 14 },
+        { brd: "BRD-26004", name: "Quality Lab Upgrade", division: "Quality", department: "Laboratory", site: "Medan", category: "Equipment", priority: "Medium", status: "Running", health: "Yellow", pic: "Maya Sari", vendor: "Local Contractor", budget: 7000000000, approved: 6800000000, actual: 3800000000, progress: 57, start: "2026-02-14", finish: "2026-08-31", approvalDays: 21 },
+        { brd: "BRD-26005", name: "Cold Chain Expansion", division: "Logistics", department: "Distribution", site: "Makassar", category: "Infrastructure", priority: "High", status: "Overdue", health: "Red", pic: "Fajar Nugraha", vendor: "Local Contractor", budget: 24000000000, approved: 23100000000, actual: 19300000000, progress: 74, start: "2025-11-01", finish: "2026-05-30", approvalDays: 27 },
+        { brd: "BRD-26006", name: "HR Workforce Analytics", division: "Human Capital", department: "HRIS", site: "Jakarta", category: "IT System", priority: "Low", status: "Completed", health: "Green", pic: "Nadia Lestari", vendor: "Telkomsigma", budget: 3900000000, approved: 3600000000, actual: 3500000000, progress: 100, start: "2025-10-12", finish: "2026-02-28", approvalDays: 12 },
+        { brd: "BRD-26007", name: "Packaging Robot Cell", division: "Manufacturing", department: "Packing", site: "Semarang", category: "Automation", priority: "High", status: "Submitted", health: "Yellow", pic: "Yusuf Hakim", vendor: "Siemens", budget: 12500000000, approved: 11800000000, actual: 1600000000, progress: 15, start: "2026-07-01", finish: "2027-01-30", approvalDays: 36 },
+        { brd: "BRD-26008", name: "Fleet Telematics Platform", division: "Logistics", department: "Transport", site: "Bandung", category: "IT System", priority: "Medium", status: "Procurement", health: "Green", pic: "Clara Tan", vendor: "Telkomsigma", budget: 6200000000, approved: 5900000000, actual: 2500000000, progress: 41, start: "2026-04-05", finish: "2026-11-20", approvalDays: 19 },
+        { brd: "BRD-26009", name: "Water Treatment Retrofit", division: "Operations", department: "Utility", site: "Medan", category: "Sustainability", priority: "High", status: "Overdue", health: "Red", pic: "Bima Prakoso", vendor: "Schneider Electric", budget: 8100000000, approved: 7600000000, actual: 5700000000, progress: 63, start: "2025-12-01", finish: "2026-05-15", approvalDays: 24 },
+        { brd: "BRD-26010", name: "Customer Data Platform", division: "Commercial", department: "Digital", site: "Jakarta", category: "IT System", priority: "Medium", status: "Running", health: "Yellow", pic: "Tania Rahman", vendor: "Accenture", budget: 13500000000, approved: 12800000000, actual: 4100000000, progress: 34, start: "2026-05-01", finish: "2026-12-31", approvalDays: 16 },
+        { brd: "BRD-26011", name: "Regional Office Renovation", division: "General Affairs", department: "Facilities", site: "Surabaya", category: "Infrastructure", priority: "Low", status: "Completed", health: "Green", pic: "Rio Saputra", vendor: "Local Contractor", budget: 4500000000, approved: 4300000000, actual: 4200000000, progress: 100, start: "2025-09-01", finish: "2026-01-30", approvalDays: 10 },
+        { brd: "BRD-26012", name: "Supplier Portal", division: "Procurement", department: "Strategic Sourcing", site: "Jakarta", category: "IT System", priority: "Medium", status: "Under Review", health: "Green", pic: "Salsa Kirana", vendor: "Accenture", budget: 5200000000, approved: 4800000000, actual: 900000000, progress: 18, start: "2026-08-01", finish: "2027-03-15", approvalDays: 29 },
+      ];
+
+      let issues = [
+        { project: "Cold Chain Expansion", title: "Civil handover delay", severity: "Critical", due: "2026-06-07", owner: "Fajar Nugraha", status: "Open" },
+        { project: "Water Treatment Retrofit", title: "Commissioning defect", severity: "Critical", due: "2026-06-12", owner: "Bima Prakoso", status: "Open" },
+        { project: "Warehouse Automation Line", title: "PLC integration retest", severity: "High", due: "2026-07-02", owner: "Ari Wibowo", status: "In Progress" },
+        { project: "Quality Lab Upgrade", title: "Calibration certificate pending", severity: "Medium", due: "2026-07-10", owner: "Maya Sari", status: "Open" },
+      ];
+
+      let activities = [
+        { date: "2026-06-28", type: "Committee Meeting", project: "Supplier Portal", text: "Revision notes recorded from investment committee." },
+        { date: "2026-06-27", type: "Purchase Order", project: "Fleet Telematics Platform", text: "PO released and delivery schedule confirmed." },
+        { date: "2026-06-25", type: "Installation", project: "Quality Lab Upgrade", text: "Equipment installation reached 57% progress." },
+        { date: "2026-06-24", type: "Issue Update", project: "Cold Chain Expansion", text: "Critical delay escalated for weekly steering review." },
+      ];
+      let documents = [];
+
+      const trend = [
+        ["Jan", 28.4, 21.2],
+        ["Feb", 32.1, 24.5],
+        ["Mar", 25.8, 19.1],
+        ["Apr", 41.7, 27.9],
+        ["May", 36.9, 31.4],
+        ["Jun", 52.5, 37.6],
+        ["Jul", 46.2, 34.2],
+        ["Aug", 58.1, 45.4],
+        ["Sep", 61.8, 50.8],
+        ["Oct", 54.3, 43.1],
+        ["Nov", 64.5, 55.7],
+        ["Dec", 72.4, 63.2],
+      ];
+
+      const navItems = ["Dashboard", "Project Workspace", "Documents", "Analytics", "Master Data", "Settings"];
+
+      const icons = {
+        Dashboard: "M4 13h7V4H4v9Zm9 7h7V4h-7v16ZM4 20h7v-5H4v5Z",
+        "Investment Request": "M6 3h12v18H6V3Zm4 5h4m-4 4h4m-4 4h3",
+        "Approval Tracking": "m9 12 2 2 4-5M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z",
+        Procurement: "M4 7h16M6 7l1 13h10l1-13M9 7V5h6v2M9 12h6",
+        Projects: "M4 5h16v14H4V5Zm4 4h8M8 13h5",
+        "Project Workspace": "M4 5h16v14H4V5Zm4 4h8M8 13h5",
+        "Project Activity": "M12 6v6l4 2M21 12a9 9 0 1 1-9-9",
+        Issues: "M12 9v4m0 4h.01M10.3 4.5 2-1.1 9 15.6H3.3l7-14.5Z",
+        "Project Review": "M5 4h14v16H5V4Zm4 4h6m-6 4h6m-6 4h4",
+        Documents: "M7 3h7l5 5v13H7V3Zm7 0v5h5",
+        Analytics: "M4 19l5-7 4 3 7-10M4 5h16v14H4V5Z",
+        "Master Data": "M4 6c0-1.1 3.6-2 8-2s8 .9 8 2-3.6 2-8 2-8-.9-8-2Zm0 0v12c0 1.1 3.6 2 8 2s8-.9 8-2V6",
+        Settings: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8 4h2M2 12h2m12.9-6.9 1.4-1.4M5.7 18.3l1.4-1.4m0-11.8L5.7 3.7m12.6 14.6-1.4-1.4",
+      };
+
+      const state = {
+        route: "Dashboard",
+        search: "",
+        filters: {
+          year: "2026",
+          division: "All",
+          site: "All",
+          category: "All",
+          status: "All",
+          priority: "All",
+          health: "All",
+        },
+        table: {
+          page: 1,
+          pageSize: 8,
+          sortKey: "approved",
+          sortDir: "desc",
+        },
+        calendarView: "month",
+      };
+
+      const calendarItems = [
+        { day: 3, date: "2026-06-03", type: "Milestone", title: "Procurement Review", project: "ERP Upgrade", status: "completed", note: "Committee notes closed." },
+        { day: 12, date: "2026-06-12", type: "Meeting", title: "Vendor Discussion", project: "Warehouse Automation", status: "upcoming", note: "Delivery schedule alignment." },
+        { day: 18, date: "2026-06-18", type: "Deadline", title: "Contract Submission", project: "Cold Chain Expansion", status: "overdue", note: "Pending legal review." },
+        { day: 24, date: "2026-06-24", type: "Completion Target", title: "Installation Sign-off", project: "Quality Lab Upgrade", status: "upcoming", note: "Target completion checkpoint." },
+        { day: 28, date: "2026-06-28", type: "Milestone", title: "Final Report Draft", project: "Solar Rooftop Phase 2", status: "completed", note: "Benefit realization captured." },
+      ];
+
+      function idr(value) {
+        if (value >= 1000000000000) return `Rp ${(value / 1000000000000).toFixed(1)} T`;
+        return `Rp ${(value / 1000000000).toFixed(1)} B`;
+      }
+
+      function svgIcon(name) {
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${icons[name] || icons.Dashboard}"/></svg>`;
+      }
+
+      function uiIcon(name) {
+        const paths = {
+          TrendingUp: `<path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/>`,
+          TrendingDown: `<path d="M4 7l6 6 4-4 6 8"/><path d="M14 17h6v-6"/>`,
+          Circle: `<circle cx="12" cy="12" r="8"/>`,
+          CheckCircle: `<circle cx="12" cy="12" r="8"/><path d="m8.5 12.5 2.3 2.3 4.8-5.2"/>`,
+          Clock: `<circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/>`,
+          AlertTriangle: `<path d="M12 4 21 20H3L12 4Z"/><path d="M12 9v5m0 3h.01"/>`,
+          Users: `<path d="M16 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 20v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>`,
+          User: `<path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/>`,
+          FileCheck: `<path d="M7 3h7l5 5v13H7V3Z"/><path d="M14 3v5h5"/><path d="m9 15 2 2 4-5"/>`,
+          Building: `<path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M16 8h2a2 2 0 0 1 2 2v11"/><path d="M8 7h4M8 11h4M8 15h4M3 21h18"/>`,
+          Wallet: `<path d="M5 7h13a2 2 0 0 1 2 2v8H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11"/><path d="M16 12h4"/>`,
+          Target: `<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>`,
+          Calendar: `<path d="M7 3v4M17 3v4M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"/>`,
+          Activity: `<path d="M4 12h4l2-6 4 12 2-6h4"/>`,
+          Wrench: `<path d="M14.7 6.3a4 4 0 0 0 5 5L11 20l-4-4 8.7-8.7Z"/><path d="m7 16-3 3"/>`,
+          ClipboardCheck: `<path d="M9 4h6l1 2h3v15H5V6h3l1-2Z"/><path d="m9 14 2 2 4-5"/>`,
+        };
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.Circle}</svg>`;
+      }
+
+      function activityIcon(type) {
+        const text = String(type || "").toLowerCase();
+        if (text.includes("meeting") || text.includes("committee")) return uiIcon("Users");
+        if (text.includes("purchase") || text.includes("po") || text.includes("order")) return uiIcon("ClipboardCheck");
+        if (text.includes("install") || text.includes("maintenance")) return uiIcon("Wrench");
+        if (text.includes("issue") || text.includes("risk")) return uiIcon("AlertTriangle");
+        if (text.includes("document") || text.includes("file")) return uiIcon("FileCheck");
+        return uiIcon("Activity");
+      }
+
+      function unique(key) {
+        return ["All", ...Array.from(new Set(projects.map((item) => item[key]))).sort()];
+      }
+
+      function statusClass(status) {
+        if (status === "Completed") return "status-completed";
+        if (status === "Overdue") return "status-overdue";
+        if (status === "Under Review" || status === "Submitted") return "status-review";
+        return "status-running";
+      }
+
+      function healthLabel(project) {
+        const health = project.health || (project.status === "Overdue" ? "Red" : project.progress >= 80 ? "Green" : "Yellow");
+        if (health === "Red") return ["Critical", "status-critical"];
+        if (health === "Yellow") return ["Need Attention", "status-pending"];
+        return ["Healthy", "status-completed"];
+      }
+
+      function lastActivityFor(project) {
+        const match = activities.find((item) => item.projectId === project.id || item.project === project.name);
+        return match ? `${match.type || "Activity"} (${match.date || "-"})` : project.remarks || "-";
+      }
+
+      function filteredProjects() {
+        const q = state.search.trim().toLowerCase();
+        return projects.filter((project) => {
+          const passFilters = ["division", "site", "category", "status", "priority"].every((key) => state.filters[key] === "All" || project[key] === state.filters[key]);
+          const passHealth = state.filters.health === "All" || healthLabel(project)[0] === state.filters.health;
+          const haystack = `${project.brd} ${project.name} ${project.division} ${project.site} ${project.category} ${project.pic} ${project.vendor}`.toLowerCase();
+          return passFilters && passHealth && (!q || haystack.includes(q));
+        });
+      }
+
+      function renderNav() {
+        document.getElementById("navigation").innerHTML = navItems.map((item) => `
+          <button class="nav-button ${state.route === item ? "active" : ""}" data-route="${item}">
+            ${svgIcon(item)}
+            <span>${item}</span>
+          </button>
+        `).join("");
+      }
+
+      function renderFilters() {
+        const config = [
+          ["year", "Year", ["2026", "2025", "2024"]],
+          ["division", "Division", unique("division")],
+          ["category", "Category", unique("category")],
+          ["status", "Status", unique("status")],
+        ];
+        const chips = Object.entries(state.filters)
+          .filter(([key, value]) => value && value !== "All" && ["division", "site", "category", "status", "priority"].includes(key))
+          .map(([key, value]) => `<span class="filter-chip">${key}: ${value}</span>`)
+          .join("");
+
+        document.getElementById("filters").innerHTML = `
+          <div class="toolbar-left">
+            <div class="toolbar-label">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+              Executive Filters
+            </div>
+            <div class="filter-controls">
+              ${config.map(([key, label, options]) => `
+                <label class="compact-filter" for="filter-${key}">
+                  <span>${label}</span>
+                  <select id="filter-${key}" data-filter="${key}">
+                    ${options.map((option) => `<option ${state.filters[key] === option ? "selected" : ""}>${option}</option>`).join("")}
+                  </select>
+                </label>
+              `).join("")}
+            </div>
+            <div class="filter-chips">${chips || `<span class="filter-chip">All portfolio</span>`}</div>
+          </div>
+          <div class="toolbar-actions">
+            <button class="button toolbar-button" type="button" data-action="refresh">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12A9 9 0 0 1 18.5 5.8"/><path d="M21 4v6h-6M3 20v-6h6"/></svg>
+              Refresh
+            </button>
+            <button class="button toolbar-button" type="button" data-action="export">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+              Export
+            </button>
+            <button class="button toolbar-button primary" type="button" data-action="advanced-filter">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+              Advanced Filter
+            </button>
+          </div>
+        `;
+      }
+
+      function renderKpis(rows) {
+        const totalApproved = rows.reduce((sum, item) => sum + item.approved, 0);
+        const totalActual = rows.reduce((sum, item) => sum + item.actual, 0);
+        const completed = rows.filter((item) => item.status === "Completed").length;
+        const running = rows.filter((item) => ["Running", "Procurement"].includes(item.status)).length;
+        const pending = rows.filter((item) => ["Submitted", "Under Review"].includes(item.status)).length;
+        const utilization = totalApproved ? Math.round((totalActual / totalApproved) * 100) : 0;
+        const filterSummary = Object.entries(state.filters)
+          .filter(([key, value]) => value && value !== "All" && key !== "year")
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(" / ") || "All portfolio";
+
+        document.getElementById("dashboardMeta").innerHTML = `
+          <span>Last updated: Jun 30, 2026 09:00 WIB</span>
+          <span>Current year: ${state.filters.year}</span>
+          <span>${filterSummary}</span>
+        `;
+        document.getElementById("heroInvestment").textContent = idr(totalApproved);
+
+        const cards = [
+          ["Total Investment", idr(totalApproved), "18%", "vs previous month", "good", "M12 3v18M17 7.5c0-2-2-3-5-3s-5 1-5 3 2 3 5 3 5 1 5 3-2 3-5 3-5-1-5-3"],
+          ["Total Projects", rows.length, "12%", "portfolio scope", "good", "M4 5h16v14H4V5Zm4 4h8M8 13h5"],
+          ["Running Projects", running, "8%", "execution portfolio", "good", "M4 19V5m0 14h16M8 16v-5m4 5V8m4 8v-7"],
+          ["Completed Projects", completed, "6%", "closed this period", "good", "m9 12 2 2 4-5M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"],
+          ["Pending Projects", pending, "4%", "need admin follow-up", "warn", "M12 6v6l4 2M21 12a9 9 0 1 1-9-9"],
+          ["Budget Utilization", `${utilization}%`, "9%", `${idr(totalActual)} actual`, utilization > 85 ? "warn" : "good", "M4 19l5-7 4 3 7-10M4 5h16v14H4V5Z"],
+          ["Average Duration", "204 days", "3%", "portfolio average", "good", "M12 6v6l4 2M21 12a9 9 0 1 1-9-9"],
+        ];
+
+        document.getElementById("kpis").innerHTML = cards.map(([label, value, change, note, tone, icon]) => `
+          <article class="panel kpi">
+            <div class="kpi-top">
+              <span>${label}</span>
+              <span class="trend ${tone}">${tone === "bad" ? uiIcon("TrendingDown") : uiIcon("TrendingUp")} ${change}</span>
+            </div>
+            <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" style="color:${tone === "warn" ? "var(--amber)" : "var(--green)"}"><path d="${icon}"/></svg>
+            <div class="kpi-value">${value}</div>
+            <div class="kpi-note">${note}</div>
+            <svg viewBox="0 0 120 24" style="width:100%;height:24px;margin-top:10px" aria-hidden="true">
+              <polyline points="0,18 18,15 36,17 54,10 72,12 90,6 120,8" fill="none" stroke="${tone === "bad" ? "var(--red)" : tone === "warn" ? "var(--amber)" : "var(--green)"}" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </article>
+        `).join("");
+      }
+
+      function renderHealthCards(rows) {
+        const total = rows.length || 1;
+        const cards = [
+          ["Healthy", "Green", "Healthy Projects", "var(--green)", "status-completed"],
+          ["Need Attention", "Yellow", "Need Attention", "var(--amber)", "status-pending"],
+          ["Critical", "Red", "Critical Projects", "var(--red)", "status-critical"],
+        ];
+        document.getElementById("healthCards").innerHTML = cards.map(([filter, raw, title, color, badgeClass]) => {
+          const count = rows.filter((project) => healthLabel(project)[0] === filter || project.health === raw).length;
+          const pct = Math.round((count / total) * 100);
+          return `
+            <article class="panel health-card" data-health-filter="${filter}">
+              <div>
+                <span class="status-pill ${badgeClass}">${title}</span>
+                <strong>${count}</strong>
+                <p class="small">${pct}% of current portfolio</p>
+              </div>
+              <div class="health-icon" style="background:${color}">${filter === "Healthy" ? uiIcon("CheckCircle") : filter === "Need Attention" ? uiIcon("Clock") : uiIcon("AlertTriangle")}</div>
+            </article>
+          `;
+        }).join("");
+      }
+
+      function calendarStatusClass(status) {
+        if (status === "overdue") return "status-critical";
+        if (status === "completed") return "status-completed";
+        return "status-pending";
+      }
+
+      function renderProjectCalendar() {
+        const itemByDay = calendarItems.reduce((acc, item) => {
+          acc[item.day] = item;
+          return acc;
+        }, {});
+        document.querySelectorAll("[data-calendar-view]").forEach((button) => {
+          button.classList.toggle("active", button.dataset.calendarView === state.calendarView);
+        });
+        const monthView = `
+          <div>
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px">
+              <div>
+                <strong>June 2026</strong>
+                <p class="small">Portfolio execution calendar</p>
+              </div>
+              <span class="badge">${calendarItems.length} events</span>
+            </div>
+            <div class="mini-calendar">
+              ${["M", "T", "W", "T", "F", "S", "S"].map((day) => `<div class="small" style="text-align:center;font-weight:900">${day}</div>`).join("")}
+              ${Array.from({ length: 30 }, (_, index) => {
+                const day = index + 1;
+                const item = itemByDay[day];
+                return `<div class="calendar-day ${item ? "has-item" : ""}">
+                  ${day}
+                  ${item ? `<div class="status-pill ${calendarStatusClass(item.status)}" style="margin-top:5px;padding:2px 6px;font-size:10px">${item.type}</div>` : ""}
+                </div>`;
+              }).join("")}
+            </div>
+          </div>
+        `;
+        const agendaView = `
+          <div class="agenda-list">
+            ${calendarItems.map((item) => `
+              <article class="agenda-item">
+                <div class="agenda-date">${item.day}<span class="small">Jun</span></div>
+                <div>
+                  <strong>${item.title}</strong>
+                  <p class="small">${item.project} / ${item.type}</p>
+                  <p class="small">${item.note}</p>
+                </div>
+                <span class="status-pill ${calendarStatusClass(item.status)}">${item.status}</span>
+              </article>
+            `).join("")}
+          </div>
+        `;
+        document.getElementById("projectCalendar").innerHTML = state.calendarView === "month"
+          ? `${monthView}${agendaView}`
+          : `${agendaView}${monthView}`;
+      }
+
+      function renderLineChart() {
+        const svg = document.getElementById("lineChart");
+        const max = 80;
+        const pointsBudget = trend.map(([month, budget], i) => [64 + i * 58, 250 - (budget / max) * 200]);
+        const pointsActual = trend.map(([month, , actual], i) => [64 + i * 58, 250 - (actual / max) * 200]);
+        const line = (points) => points.map((point) => point.join(",")).join(" ");
+        const grid = [0, 20, 40, 60, 80].map((value) => {
+          const y = 250 - (value / max) * 200;
+          return `<line x1="52" x2="720" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="18" y="${y + 4}" fill="var(--muted)" font-size="11">${value}B</text>`;
+        }).join("");
+        const labels = trend.map(([month], i) => `<text x="${58 + i * 58}" y="282" fill="var(--muted)" font-size="11">${month}</text>`).join("");
+        svg.innerHTML = `
+          ${grid}
+          ${labels}
+          <polyline points="${line(pointsBudget)}" fill="none" stroke="var(--primary)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="${line(pointsActual)}" fill="none" stroke="var(--teal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          ${pointsBudget.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4" fill="var(--primary)"/>`).join("")}
+          ${pointsActual.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4" fill="var(--teal)"/>`).join("")}
+          <text x="548" y="28" fill="var(--primary)" font-size="12" font-weight="700">Budget Trend</text>
+          <text x="646" y="28" fill="var(--teal)" font-size="12" font-weight="700">Actual</text>
+        `;
+      }
+
+      function groupedBars(containerId, rows, key, valueKey, limit = 6) {
+        const totals = rows.reduce((acc, item) => {
+          acc[item[key]] = (acc[item[key]] || 0) + item[valueKey];
+          return acc;
+        }, {});
+        const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, limit);
+        const max = Math.max(...sorted.map(([, value]) => value), 1);
+        document.getElementById(containerId).innerHTML = sorted.map(([label, value]) => `
+          <div class="bar-row">
+            <strong class="small">${label}</strong>
+            <div class="bar-track"><div class="bar" style="width:${Math.max(6, (value / max) * 100)}%"></div></div>
+            <span class="small">${idr(value)}</span>
+          </div>
+        `).join("");
+      }
+
+      function renderHealthBars(rows) {
+        renderHealthCards(rows);
+      }
+
+      function renderBudgetBars(rows) {
+        const sample = rows.slice(0, 6);
+        const max = Math.max(...sample.map((item) => Math.max(item.approved || 0, item.actual || 0)), 1);
+        document.getElementById("budgetBars").innerHTML = sample.map((item) => `
+          <div style="margin: 12px 0">
+            <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:6px">
+              <strong class="small">${item.brd}</strong>
+              <span class="small">${idr(item.actual || 0)} / ${idr(item.approved || 0)}</span>
+            </div>
+            <div class="bar-track" style="height:18px"><div class="bar" style="width:${Math.max(4, ((item.approved || 0) / max) * 100)}%; background:var(--line)"></div></div>
+            <div class="bar-track" style="height:8px;margin-top:-13px"><div class="bar" style="width:${Math.max(4, ((item.actual || 0) / max) * 100)}%; background:var(--green)"></div></div>
+          </div>
+        `).join("") || `<div class="empty"><strong>No budget data</strong></div>`;
+      }
+
+      function renderCategoryDonut(rows) {
+        const totals = Object.entries(rows.reduce((acc, item) => {
+          acc[item.category || "Uncategorized"] = (acc[item.category || "Uncategorized"] || 0) + Number(item.approved || 0);
+          return acc;
+        }, {})).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const total = totals.reduce((sum, [, value]) => sum + value, 0) || 1;
+        const colors = ["#0F172A", "#10B981", "#F59E0B", "#2563EB", "#BE123C"];
+        let offset = 25;
+        const segments = totals.map(([label, value], index) => {
+          const size = (value / total) * 100;
+          const segment = `${colors[index]} ${offset}% ${offset + size}%`;
+          offset += size;
+          return segment;
+        }).join(", ");
+        document.getElementById("categoryDonut").innerHTML = `
+          <div style="display:grid;grid-template-columns:140px 1fr;gap:18px;align-items:center">
+            <div style="width:132px;height:132px;border-radius:999px;background:conic-gradient(${segments});display:grid;place-items:center">
+              <div style="width:74px;height:74px;border-radius:999px;background:var(--surface);display:grid;place-items:center;font-weight:800">${totals.length}</div>
+            </div>
+            <div>
+              ${totals.map(([label, value], index) => `
+                <div class="bar-row" style="grid-template-columns:10px 1fr auto;margin:8px 0">
+                  <span style="width:10px;height:10px;border-radius:99px;background:${colors[index]}"></span>
+                  <strong class="small">${label}</strong>
+                  <span class="small">${Math.round((value / total) * 100)}%</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderStatusDonut(rows) {
+        const totals = Object.entries(rows.reduce((acc, item) => {
+          acc[item.status || "Draft"] = (acc[item.status || "Draft"] || 0) + 1;
+          return acc;
+        }, {})).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const total = totals.reduce((sum, [, value]) => sum + value, 0) || 1;
+        const colors = ["#10B981", "#F59E0B", "#1E293B", "#2563EB", "#BE123C"];
+        let offset = 0;
+        const segments = totals.map(([, value], index) => {
+          const size = (value / total) * 100;
+          const segment = `${colors[index]} ${offset}% ${offset + size}%`;
+          offset += size;
+          return segment;
+        }).join(", ");
+        document.getElementById("statusDonut").innerHTML = `
+          <div style="display:grid;grid-template-columns:140px 1fr;gap:18px;align-items:center">
+            <div style="width:132px;height:132px;border-radius:999px;background:conic-gradient(${segments});display:grid;place-items:center">
+              <div style="width:74px;height:74px;border-radius:999px;background:var(--surface);display:grid;place-items:center;font-weight:800">${rows.length}</div>
+            </div>
+            <div>${totals.map(([label, value], index) => `
+              <div class="bar-row" style="grid-template-columns:10px 1fr auto;margin:8px 0">
+                <span style="width:10px;height:10px;border-radius:99px;background:${colors[index]}"></span>
+                <strong class="small">${label}</strong>
+                <span class="small">${value}</span>
+              </div>
+            `).join("")}</div>
+          </div>
+        `;
+      }
+
+      function renderCompletionArea() {
+        const svg = document.getElementById("completionArea");
+        const values = [1, 2, 2, 3, 5, 6, 8, 10, 12, 14, 17, 20];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const max = 22;
+        const points = values.map((value, i) => [58 + i * 58, 250 - (value / max) * 200]);
+        const area = `58,250 ${points.map((point) => point.join(",")).join(" ")} ${58 + (values.length - 1) * 58},250`;
+        svg.innerHTML = `
+          <polygon points="${area}" fill="rgba(16,185,129,.16)"></polygon>
+          <polyline points="${points.map((point) => point.join(",")).join(" ")}" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round"/>
+          ${months.map((month, i) => `<text x="${52 + i * 58}" y="282" fill="var(--muted)" font-size="11">${month}</text>`).join("")}
+          ${[0, 5, 10, 15, 20].map((value) => {
+            const y = 250 - (value / max) * 200;
+            return `<line x1="46" x2="720" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="18" y="${y + 4}" fill="var(--muted)" font-size="11">${value}</text>`;
+          }).join("")}
+        `;
+      }
+
+      function renderProjectHighlight(rows) {
+        const project = [...rows].sort((a, b) => (b.approved || 0) - (a.approved || 0))[0];
+        if (!project) {
+          document.getElementById("projectHighlight").innerHTML = `<div class="empty">No highlighted project available.</div>`;
+          return;
+        }
+        const days = Math.max(0, Math.ceil((new Date(project.finish) - new Date("2026-06-30")) / 86400000));
+        const [health, healthClass] = healthLabel(project);
+        document.getElementById("projectHighlight").innerHTML = `
+          <div>
+            <span class="badge">Featured by highest budget</span>
+            <h3 class="highlight-title">${project.name}</h3>
+            <p class="small">${project.objective || project.remarks || "Strategic investment project under portfolio monitoring."}</p>
+            <div style="margin-top:18px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><strong>Current Progress</strong><span>${project.progress}%</span></div>
+              <div class="progress-track" style="width:100%;height:12px"><div class="progress-fill" style="width:${project.progress}%"></div></div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-tile highlight-metric"><span class="metric-icon-box">${uiIcon("Wallet")}</span><div><span class="metric-label">Budget</span><strong class="metric-value">${idr(project.approved || project.budget || 0)}</strong></div></div>
+              <div class="metric-tile highlight-metric"><span class="metric-icon-box">${uiIcon("User")}</span><div><span class="metric-label">PIC</span><strong class="metric-value">${project.pic || "-"}</strong></div></div>
+              <div class="metric-tile highlight-metric"><span class="metric-icon-box">${uiIcon("Building")}</span><div><span class="metric-label">Vendor</span><strong class="metric-value">${project.vendor || "-"}</strong></div></div>
+              <div class="metric-tile highlight-metric"><span class="metric-icon-box">${uiIcon("Calendar")}</span><div><span class="metric-label">Remaining</span><strong class="metric-value">${days} days</strong></div></div>
+            </div>
+          </div>
+          <div class="metric-tile" style="display:grid;align-content:center;gap:16px;background:linear-gradient(180deg,var(--surface-2),var(--surface))">
+            <span class="status-pill ${healthClass}">${health}</span>
+            <div style="font-size:54px;font-weight:900">${project.progress}%</div>
+            <p class="small">Status: ${project.status} / Finish: ${project.finish || "-"}</p>
+            <button class="button primary project-workspace-cta" type="button" data-route="Project Workspace">View Workspace ${uiIcon("TrendingUp")}</button>
+          </div>
+        `;
+      }
+
+      function renderTimeline() {
+        document.getElementById("activityList").innerHTML = [...activities].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 6).map((item) => `
+          <article class="activity-card">
+            <div class="activity-dot">${activityIcon(item.type || item["Activity Type"] || "")}</div>
+            <div>
+              <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+                <strong>${item.type || item["Activity Type"] || "Project Activity"}</strong>
+                <span class="status-pill status-running">${item.status || "Running"}</span>
+              </div>
+              <p class="small">${item.date || item["Activity Date"] || "-"} / ${item.project || item["Project ID"] || "-"}</p>
+              <p class="small">PIC: ${item.pic || item.PIC || "Investment Admin"} / Progress: ${item.progress || "-"}%</p>
+              <p style="margin-top:8px">${item.text || item.Description || "Vendor confirmed delivery schedule."}</p>
+              <p class="small" style="margin-top:8px">Attachment: paperclip</p>
+            </div>
+          </article>
+        `).join("");
+      }
+
+      function renderTable(rows) {
+        const sorted = [...rows].sort((a, b) => {
+          const key = state.table.sortKey;
+          const av = a[key] ?? "";
+          const bv = b[key] ?? "";
+          const result = typeof av === "number" || typeof bv === "number"
+            ? Number(av || 0) - Number(bv || 0)
+            : String(av).localeCompare(String(bv));
+          return state.table.sortDir === "asc" ? result : -result;
+        });
+        const totalPages = Math.max(1, Math.ceil(sorted.length / state.table.pageSize));
+        state.table.page = Math.min(state.table.page, totalPages);
+        const start = (state.table.page - 1) * state.table.pageSize;
+        const pageRows = sorted.slice(start, start + state.table.pageSize);
+        document.getElementById("projectCount").textContent = `${rows.length} records`;
+        document.getElementById("projectTable").innerHTML = pageRows.length ? pageRows.map((project) => `
+          <tr>
+            <td><strong>${project.name}</strong><br><span class="small">${project.brd}</span></td>
+            <td>${project.division}</td>
+            <td>${project.vendor || "-"}</td>
+            <td>${project.pic}</td>
+            <td>${idr(project.approved || project.budget || 0)}</td>
+            <td>
+              <div class="progress">
+                <div class="progress-track"><div class="progress-fill" style="width:${project.progress}%"></div></div>
+                <span class="small">${project.progress}%</span>
+              </div>
+            </td>
+            <td><span class="status-pill ${healthLabel(project)[1]}">${healthLabel(project)[0]}</span></td>
+            <td><span class="status-pill ${statusClass(project.status)}">${project.status}</span></td>
+            <td>${lastActivityFor(project)}</td>
+            <td>${project.updatedAt ? project.updatedAt.slice(0, 10) : project.finish || "-"}</td>
+            <td><button class="button" style="min-height:32px;padding:0 10px">Open</button></td>
+          </tr>
+        `).join("") : `<tr><td colspan="11"><div class="empty"><div><strong>No records match the current filter.</strong><p class="small">Adjust filters or search terms to see portfolio data.</p></div></div></td></tr>`;
+        document.getElementById("tablePager").innerHTML = `
+          <span class="small">Showing ${rows.length ? start + 1 : 0}-${Math.min(start + state.table.pageSize, rows.length)} of ${rows.length} / sorted by ${state.table.sortKey} ${state.table.sortDir}</span>
+          <div style="display:flex;gap:8px">
+            <button class="button toolbar-button" type="button" data-page="prev">Previous</button>
+            <span class="badge">Page ${state.table.page} of ${totalPages}</span>
+            <button class="button toolbar-button" type="button" data-page="next">Next</button>
+          </div>
+        `;
+      }
+
+      function moduleTemplate(title, summary, primary) {
+        return `
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>${title}</h2>
+                <p class="small">${summary}</p>
+              </div>
+              <span class="badge">Workspace</span>
+            </div>
+            <div class="panel-body">${primary}</div>
+          </section>
+        `;
+      }
+
+      function workspaceMarkup() {
+        const project = [...projects].sort((a, b) => (b.approved || 0) - (a.approved || 0))[0] || projects[0];
+        if (!project) return `<div class="empty">No project workspace available.</div>`;
+        const variance = (project.approved || 0) - (project.actual || 0);
+        const duration = project.start && project.finish ? Math.max(0, Math.ceil((new Date(project.finish) - new Date(project.start)) / 86400000)) : 0;
+        const delay = project.status === "Overdue" ? "Delayed" : "On track";
+        return `
+          <div class="workflow">${["Overview", "Activity", "Documents", "Review", "Settings"].map((tab, index) => `<div class="stage"><strong>${tab}</strong><span class="status-pill ${index === 0 ? "status-running" : "status-completed"}">${index === 0 ? "Active" : "Ready"}</span><p class="small" style="margin-top:8px">${tab === "Activity" ? "Daily Project Journal." : tab === "Review" ? "Corporate final report." : "Workspace module."}</p></div>`).join("")}</div>
+          <div class="highlight-card" style="margin-top:16px">
+            <div>
+              <span class="badge">Overview</span>
+              <h3 class="highlight-title">${project.name}</h3>
+              <p class="small">${project.division} / ${project.category} / PIC ${project.pic}</p>
+              <div class="workspace-metric-row">
+                <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Budget</span><strong class="workspace-kpi-value">Rp 23.1 B</strong></div>
+                <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Variance</span><strong class="workspace-kpi-value">Rp 3.8 B</strong></div>
+                <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Duration</span><strong class="workspace-kpi-value">210 days</strong></div>
+                <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Delay</span><strong class="workspace-kpi-value">Delayed</strong></div>
+              </div>
+              <div style="margin-top:18px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px"><strong>Progress</strong><span>${project.progress}%</span></div>
+                <div class="progress-track" style="width:100%;height:12px"><div class="progress-fill" style="width:${project.progress}%"></div></div>
+              </div>
+            </div>
+            <div class="metric-tile" style="display:grid;place-items:center;text-align:center">
+              <div style="width:150px;height:150px;border-radius:999px;background:conic-gradient(var(--green) ${project.progress}%, var(--line) 0);display:grid;place-items:center">
+                <div style="width:104px;height:104px;border-radius:999px;background:var(--surface);display:grid;place-items:center;font-size:30px;font-weight:900">${project.progress}%</div>
+              </div>
+              <span class="status-pill ${healthLabel(project)[1]}">${healthLabel(project)[0]}</span>
+              <p class="small">Timeline: ${project.start || "-"} to ${project.finish || "-"}</p>
+            </div>
+          </div>
+        `;
+      }
+      function documentFolderMarkup() {
+        const grouped = projects.slice(0, 6).map((project) => {
+          const projectDocs = documents.filter((doc) => doc["Project ID"] === project.id || doc.projectId === project.id);
+          const fallbackDocs = ["BRD", "Contract", "Progress Report", "LPJ", "Final Report"].map((name, index) => ({
+            name,
+            version: `v${index + 1}.0`,
+            date: project.finish || "2026-06-30",
+            uploader: "Investment Admin",
+          }));
+          const docs = projectDocs.length ? projectDocs.map((doc) => ({
+            name: doc["File Name"] || doc.category || "Project Document",
+            version: doc.Version || doc.version || "v1.0",
+            date: doc["Upload Date"] || doc.uploadDate || "-",
+            uploader: doc["Uploaded By"] || doc.uploadedBy || "Investment Admin",
+          })) : fallbackDocs;
+          return { project, docs };
+        });
+        return `
+          <div class="folder-list">
+            ${grouped.map(({ project, docs }) => `
+              <div class="folder-card">
+                <div class="folder-head">
+                  <strong>Folder: ${project.name}</strong>
+                  <span class="status-pill ${statusClass(project.status)}">${project.status}</span>
+                  <span class="badge">${project.progress}%</span>
+                  <span class="badge">${docs.length} documents</span>
+                </div>
+                <div class="doc-grid">
+                  ${docs.map((doc) => `
+                    <div class="doc-row">
+                      <strong>${doc.name}</strong>
+                      <span class="badge">${doc.version}</span>
+                      <span class="small">${doc.date}</span>
+                      <span class="small">${doc.uploader}</span>
+                      <button class="button toolbar-button">Preview</button>
+                      <button class="button toolbar-button">Download</button>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      function compactSparkline(values) {
+        const max = Math.max(...values, 1);
+        const points = values.map((value, index) => `${(index / Math.max(values.length - 1, 1)) * 100},${34 - (value / max) * 28}`).join(" ");
+        return `<svg class="mini-spark" viewBox="0 0 100 36" preserveAspectRatio="none"><polyline points="${points}" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 35 L${points.replaceAll(" ", " L")} L100 35 Z" fill="rgba(37,99,235,.08)"/></svg>`;
+      }
+
+      function kpiIconSvg(type) {
+        const paths = {
+          investment: `<circle cx="12" cy="12" r="8"/><path d="M12 7v10M9 10.2c0-1.2 1.1-2 3-2s3 .8 3 2-1.1 1.8-3 1.8-3 .7-3 2 1.1 2 3 2 3-.8 3-2"/>`,
+          growth: `<path d="M4 17 10 11l4 4 6-8"/><path d="M14 7h6v6"/>`,
+          pie: `<path d="M12 3v9h9"/><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5"/><path d="M14 3.3A8 8 0 0 1 20.7 10"/>`,
+          activity: `<path d="M4 12h4l2-6 4 12 2-6h4"/>`,
+          check: `<circle cx="12" cy="12" r="8"/><path d="m8.5 12.5 2.3 2.3 4.8-5.2"/>`,
+          clock: `<circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/>`,
+          wallet: `<path d="M5 7h13a2 2 0 0 1 2 2v8H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11"/><path d="M16 12h4"/>`,
+          alert: `<path d="M12 4 21 20H3L12 4Z"/><path d="M12 9v5m0 3h.01"/>`,
+          target: `<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>`,
+          pause: `<circle cx="12" cy="12" r="8"/><path d="M10 9v6m4-6v6"/>`,
+        };
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[type] || paths.investment}</svg>`;
+      }
+
+      function simpleChart(title, type, values, labels) {
+        const max = Math.max(...values, 1);
+        const palette = ["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444", "#14B8A6", "#64748B", "#F97316"];
+        const bars = values.map((value, index) => {
+          const width = Math.max(8, (value / max) * 100);
+          const color = palette[index % palette.length];
+          return `<div class="chart-bar-row" title="${labels[index]}: ${value}"><span class="small">${labels[index]}</span><div class="chart-track"><div class="chart-fill" style="width:${width}%;background:linear-gradient(90deg, ${color}, color-mix(in srgb, ${color} 64%, white))"></div></div><strong class="small">${Math.round(width)}%</strong></div>`;
+        }).join("");
+        const points = values.map((value, index) => `${60 + index * 86},${210 - (value / max) * 150}`);
+        const line = `<svg class="chart" viewBox="0 0 760 240" role="img" aria-label="${title}">
+          <defs><linearGradient id="grad-${title.replace(/\W/g, "")}" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#3B82F6" stop-opacity=".24"/><stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/></linearGradient></defs>
+          ${[60, 110, 160, 210].map((y) => `<path d="M48 ${y}H704" stroke="#E2E8F0" stroke-width="1"/>`).join("")}
+          <path d="M60 210 ${points.map((point) => `L${point.replace(",", " ")}`).join(" ")} L680 210 Z" fill="url(#grad-${title.replace(/\W/g, "")})"/>
+          <polyline points="${points.join(" ")}" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          ${points.map((point, index) => `<circle cx="${point.split(",")[0]}" cy="${point.split(",")[1]}" r="4" fill="#fff" stroke="${palette[index % palette.length]}" stroke-width="3"><title>${labels[index]}: ${values[index]}</title></circle>`).join("")}
+        </svg><div class="chart-axis">${labels.map((label) => `<span>${label}</span>`).join("")}</div>`;
+        return `
+          <section class="panel chart-card analytics-chart">
+            <div class="panel-header"><h2>${title}</h2><span class="badge">${type}</span></div>
+            <div class="panel-body">
+              <div class="chart-legend"><span class="small"><i class="legend-dot" style="background:#3B82F6"></i>Actual</span><span class="small"><i class="legend-dot" style="background:#10B981"></i>Target</span><span class="small"><i class="legend-dot" style="background:#F59E0B"></i>Variance</span></div>
+              ${type === "Line" || type === "Area" ? line : `<div class="chart-bar-list">${bars}</div>`}
+            </div>
+          </section>
+        `;
+      }
+
+      function groupedTotals(field) {
+        return projects.reduce((acc, project) => {
+          const key = project[field] || "Unassigned";
+          acc[key] = (acc[key] || 0) + (project.approved || project.budget || 0);
+          return acc;
+        }, {});
+      }
+
+      function rankingCard(title, rows, formatValue) {
+        return `
+          <details class="ranking-card" open>
+            <summary>${title}<span class="badge">Top 5</span></summary>
+            <div class="ranking-list">
+              ${rows.slice(0, 5).map((project, index) => `
+                <div class="ranking-row">
+                  <span class="rank-number">${index + 1}</span>
+                  <div><strong>${project.name}</strong><div class="small">${project.division} / ${project.pic}</div></div>
+                  <span class="badge">${formatValue(project)}</span>
+                </div>
+              `).join("")}
+            </div>
+          </details>
+        `;
+      }
+
+      function heatmapCard(title, totals) {
+        const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+        const max = Math.max(...entries.map(([, value]) => value), 1);
+        const colors = ["#22C55E", "#FACC15", "#F97316", "#EF4444", "#3B82F6", "#8B5CF6"];
+        return `
+          <section class="heatmap-card">
+            <div class="panel-header" style="padding:0;border:0"><h2>${title}</h2><span class="badge">Intensity</span></div>
+            <div class="heatmap-cells">
+              ${entries.map(([label, value]) => {
+                const count = projects.filter((project) => project.division === label || project.site === label || project.category === label).length;
+                const risk = projects.filter((project) => (project.division === label || project.site === label || project.category === label) && healthLabel(project)[0] !== "Healthy").length;
+                const score = (value / max) * 0.58 + (count / Math.max(projects.length, 1)) * 0.24 + (risk / Math.max(count, 1)) * 0.18;
+                const color = colors[Math.min(colors.length - 1, Math.floor(score * colors.length))];
+                return `<div class="heatmap-cell" title="${label}: ${idr(value)}, ${count} projects, ${risk} risk signals" data-tooltip="${label} | Investment: ${idr(value)} | Projects: ${count} | Risk signals: ${risk}" style="background:linear-gradient(135deg, color-mix(in srgb, ${color} 88%, white), color-mix(in srgb, ${color} 76%, #0f172a))"><strong>${label}</strong><span>${idr(value)}</span><span class="small">${count} projects / ${risk} risk</span></div>`;
+              }).join("")}
+            </div>
+          </section>
+        `;
+      }
+
+      function analyticsModuleMarkup() {
+        const totalInvestment = projects.reduce((sum, project) => sum + (project.approved || project.budget || 0), 0);
+        const totalActual = projects.reduce((sum, project) => sum + (project.actual || 0), 0);
+        const completed = projects.filter((project) => project.status === "Completed").length;
+        const running = projects.filter((project) => project.status === "Running").length;
+        const avgProgress = Math.round(projects.reduce((sum, project) => sum + (project.progress || 0), 0) / Math.max(projects.length, 1));
+        const avgCost = totalInvestment / Math.max(projects.length, 1);
+        const avgVariance = (totalInvestment - totalActual) / Math.max(projects.length, 1);
+        const budgetUtilization = Math.round((totalActual / Math.max(totalInvestment, 1)) * 100);
+        const durations = projects.map((project) => project.start && project.finish ? Math.ceil((new Date(project.finish) - new Date(project.start)) / 86400000) : 0);
+        const avgDuration = Math.round(durations.reduce((sum, value) => sum + value, 0) / Math.max(durations.length, 1));
+        const today = new Date("2026-06-30");
+        const recentCutoff = new Date(today);
+        recentCutoff.setDate(today.getDate() - 7);
+        const inactive = projects.filter((project) => new Date(lastActivityFor(project)) < recentCutoff);
+        const overdue = projects.filter((project) => project.status === "Overdue" || (project.finish && new Date(project.finish) < today && project.status !== "Completed"));
+        const nearDeadline = projects.filter((project) => project.finish && Math.ceil((new Date(project.finish) - today) / 86400000) <= 30 && project.status !== "Completed");
+        const highBudgetUse = projects.filter((project) => project.approved && (project.actual || 0) / project.approved >= 0.9);
+        const incompleteDocs = projects.filter((project) => !documents.some((doc) => doc["Project ID"] === project.id || doc.projectId === project.id));
+        const divisionTotals = groupedTotals("division");
+        const categoryTotals = groupedTotals("category");
+        const siteTotals = groupedTotals("site");
+        const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
+        const monthValues = [18, 24, 21, 31, 34, 40, 43];
+        const insightRows = [
+          ["Investment spending increased", "18% compared to last month based on current portfolio trend.", "status-completed"],
+          ["Budget utilization", `${budgetUtilization}% of approved budget has been consumed.`, "status-running"],
+          ["Projects approaching target", `${nearDeadline.length} projects require executive attention before deadline.`, "status-attention"],
+          ["Highest investment division", `${Object.entries(divisionTotals).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A"} contributes the highest investment this year.`, "status-running"],
+          ["Inactive project signal", `${inactive.length} projects have no activity during the last seven days.`, inactive.length ? "status-critical" : "status-completed"],
+        ];
+        const kpis = [
+          ["Total Investment", idr(totalInvestment), "+18%", "Approved portfolio value", "investment"],
+          ["Investment Growth", "18%", "+4%", "Month over month", "growth"],
+          ["Budget Utilization", `${budgetUtilization}%`, "+7%", "Actual vs approved", "pie"],
+          ["Running Projects", running, "+2", "Active execution", "activity"],
+          ["Completed Projects", completed, "+1", "Closed initiatives", "check"],
+          ["Average Duration", `${avgDuration}d`, "-5%", "Planned delivery", "clock"],
+          ["Average Cost", idr(avgCost), "+6%", "Per project", "wallet"],
+          ["Average Variance", idr(avgVariance), "-3%", "Budget remaining", "alert"],
+          ["Completion Rate", `${Math.round((completed / Math.max(projects.length, 1)) * 100)}%`, "+2%", "Portfolio completion", "target"],
+          ["No Recent Activity", inactive.length, inactive.length ? "+1" : "0", "Last 7 days", "pause"],
+        ];
+        return `
+          <div class="analytics-page">
+            <section class="module-hero">
+              <div>
+                <div class="eyebrow">Executive Decision Support Dashboard</div>
+                <h2>Analytics</h2>
+                <p class="small">Portfolio performance, investment utilization, execution health, ranking, watchlist, and management-ready export options.</p>
+              </div>
+              <div class="detail-toolbar">
+                <button class="button toolbar-button">Dashboard PDF</button>
+                <button class="button toolbar-button">Excel Summary</button>
+                <button class="button">Generate Executive Report</button>
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Executive Insights</h2><span class="badge">Generated from portfolio data</span></div>
+              <div class="insight-grid">${insightRows.map(([title, text, status]) => `<div class="insight-card"><div class="insight-top"><span class="status-pill ${status}">${title}</span>${svgIcon("Analytics")}</div><p class="small" style="margin-top:12px">${text}</p></div>`).join("")}</div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>KPI Analytics</h2><span class="badge">10 indicators</span></div>
+              <div class="analytics-kpi-grid">${kpis.map(([title, value, change, subtitle, icon], index) => `
+                <div class="analytics-kpi">
+                  <div class="kpi-head">
+                    <span class="kpi-icon-box">${kpiIconSvg(icon)}</span>
+                    <span class="kpi-label">${title}</span>
+                  </div>
+                  <strong>${value}</strong>
+                  <div class="kpi-subline">
+                    <span class="status-pill ${String(change).startsWith("-") ? "status-attention" : "status-completed"}">${change}</span>
+                    <span class="small">${subtitle}</span>
+                  </div>
+                  ${compactSparkline([18 + index, 22 + index, 19 + index, 27 + index, 31 + index])}
+                </div>
+              `).join("")}</div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Investment Analytics</h2><span class="badge">Maximum two charts per row</span></div>
+              <div class="analytics-chart-grid">
+                ${simpleChart("Investment Trend", "Line", monthValues, monthLabels)}
+                ${simpleChart("Budget Trend", "Area", [16, 20, 26, 28, 36, 38, 42], monthLabels)}
+                ${simpleChart("Budget vs Actual", "Bar", [totalInvestment, totalActual], ["Budget", "Actual"])}
+                ${simpleChart("Monthly Investment", "Bar", monthValues, monthLabels)}
+                ${simpleChart("Investment by Division", "Bar", Object.values(divisionTotals), Object.keys(divisionTotals))}
+                ${simpleChart("Investment by Category", "Bar", Object.values(categoryTotals), Object.keys(categoryTotals))}
+                ${simpleChart("Investment by Site", "Bar", Object.values(siteTotals), Object.keys(siteTotals))}
+                ${simpleChart("Investment Growth", "Line", [10, 14, 12, 18, 22, 25, 31], monthLabels)}
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Project Performance Analytics</h2><span class="badge">Execution view</span></div>
+              <div class="analytics-chart-grid">
+                ${simpleChart("Project Status Distribution", "Bar", ["Running", "Completed", "Pending", "Overdue"].map((status) => projects.filter((project) => project.status === status).length), ["Running", "Completed", "Pending", "Overdue"])}
+                ${simpleChart("Completion Trend", "Line", [8, 11, 13, 16, 21, 24, completed + 24], monthLabels)}
+                ${simpleChart("Average Progress", "Bar", [avgProgress], ["Progress"])}
+                ${simpleChart("Average Delay", "Bar", [overdue.length, nearDeadline.length], ["Overdue", "Near Due"])}
+                ${simpleChart("Project Health Distribution", "Bar", ["Healthy", "Need Attention", "Critical"].map((label) => projects.filter((project) => healthLabel(project)[0] === label).length), ["Healthy", "Attention", "Critical"])}
+                ${simpleChart("Milestone Completion", "Line", [22, 28, 32, 39, 46, 52, 61], monthLabels)}
+                ${simpleChart("Project Timeline Performance", "Area", [72, 75, 73, 78, 81, 84, 86], monthLabels)}
+                ${simpleChart("Project Duration Comparison", "Bar", durations.slice(0, 6), projects.slice(0, 6).map((project) => project.name.slice(0, 14)))}
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Portfolio Watchlist</h2><span class="badge">Selectable monitoring categories</span></div>
+              <div class="watchlist-grid">${[
+                ["Overdue Schedule", overdue.length, "status-critical"],
+                ["No Activity 7 Days", inactive.length, inactive.length ? "status-critical" : "status-completed"],
+                ["Budget Utilization > 90%", highBudgetUse.length, "status-attention"],
+                ["Incomplete Documents", incompleteDocs.length, "status-attention"],
+                ["Near Target Completion", nearDeadline.length, "status-running"],
+              ].map(([title, count, status]) => `<button class="watch-card" type="button"><div class="watch-top"><span class="status-pill ${status}">${title}</span>${svgIcon("Issues")}</div><div class="watch-count">${count}</div><p class="small">Filter Analytics Detail Table</p></button>`).join("")}</div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Portfolio Ranking</h2><span class="badge">Collapsible cards</span></div>
+              <div class="ranking-grid">
+                ${rankingCard("Highest Investment", [...projects].sort((a, b) => (b.approved || 0) - (a.approved || 0)), (project) => idr(project.approved || 0))}
+                ${rankingCard("Largest Budget", [...projects].sort((a, b) => (b.budget || b.approved || 0) - (a.budget || a.approved || 0)), (project) => idr(project.budget || project.approved || 0))}
+                ${rankingCard("Fastest Completed Projects", [...projects].sort((a, b) => (a.progress === 100 ? 0 : 1) - (b.progress === 100 ? 0 : 1) || a.name.localeCompare(b.name)), (project) => `${project.progress}%`)}
+                ${rankingCard("Longest Running Projects", [...projects].sort((a, b) => ((b.start && b.finish) ? new Date(b.finish) - new Date(b.start) : 0) - ((a.start && a.finish) ? new Date(a.finish) - new Date(a.start) : 0)), (project) => `${durations[projects.indexOf(project)] || 0}d`)}
+                ${rankingCard("Projects Near Deadline", nearDeadline.concat(projects).filter((project, index, arr) => arr.findIndex((item) => item.id === project.id) === index), (project) => project.finish || "-")}
+                ${rankingCard("Budget Utilization", [...projects].sort((a, b) => ((b.actual || 0) / Math.max(b.approved || 1, 1)) - ((a.actual || 0) / Math.max(a.approved || 1, 1))), (project) => `${Math.round(((project.actual || 0) / Math.max(project.approved || 1, 1)) * 100)}%`)}
+                ${rankingCard("Most Active Projects", [...projects].sort((a, b) => activities.filter((activity) => activity.projectId === b.id || activity["Project ID"] === b.id).length - activities.filter((activity) => activity.projectId === a.id || activity["Project ID"] === a.id).length), (project) => `${activities.filter((activity) => activity.projectId === project.id || activity["Project ID"] === project.id).length} acts`)}
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Portfolio Heatmap</h2><span class="badge">Investment amount and count</span></div>
+              <div class="heatmap-grid">
+                ${heatmapCard("Heatmap by Division", divisionTotals)}
+                ${heatmapCard("Heatmap by Site", siteTotals)}
+                ${heatmapCard("Heatmap by Category", categoryTotals)}
+              </div>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Analytics Detail Table</h2><span class="badge">Search, filter, sort, paginate</span></div>
+              <section class="panel">
+                <div class="panel-body">
+                  <div class="detail-toolbar" style="margin-bottom:12px">
+                    <label class="search"><input placeholder="Search analytics rows..." /></label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button toolbar-button">Column Visibility</button><button class="button toolbar-button">Export Selected Rows</button></div>
+                  </div>
+                  <div class="table-wrap">
+                    <table>
+                      <thead><tr>${["Project", "Division", "Site", "Vendor", "Investment", "Budget", "Actual Cost", "Budget Variance", "Progress", "Status", "Health", "Duration", "Delay", "Last Activity", "Last Update"].map((head) => `<th>${head}</th>`).join("")}</tr></thead>
+                      <tbody>${projects.map((project) => {
+                        const variance = (project.approved || 0) - (project.actual || 0);
+                        const duration = project.start && project.finish ? Math.max(0, Math.ceil((new Date(project.finish) - new Date(project.start)) / 86400000)) : 0;
+                        return `<tr><td><strong>${project.name}</strong></td><td>${project.division}</td><td>${project.site || "-"}</td><td>${project.vendor || "-"}</td><td>${idr(project.approved || 0)}</td><td>${idr(project.budget || project.approved || 0)}</td><td>${idr(project.actual || 0)}</td><td>${idr(variance)}</td><td>${project.progress}%</td><td><span class="status-pill ${statusClass(project.status)}">${project.status}</span></td><td><span class="status-pill ${healthLabel(project)[1]}">${healthLabel(project)[0]}</span></td><td>${duration}d</td><td>${project.status === "Overdue" ? "Delayed" : "On track"}</td><td>${lastActivityFor(project)}</td><td>${project.updatedAt ? project.updatedAt.slice(0, 10) : "-"}</td></tr>`;
+                      }).join("")}</tbody>
+                    </table>
+                  </div>
+                  <div class="pagination"><span class="small">Showing ${projects.length} analytics rows</span><span class="badge">Page 1 of 1</span></div>
+                </div>
+              </section>
+            </section>
+
+            <section class="dashboard-section">
+              <div class="section-title"><h2>Export Center</h2><span class="badge">Executive reporting</span></div>
+              <div class="export-card">
+                <div class="export-actions">
+                  <div><strong>Generate management-ready reports</strong><p class="small">Includes executive summary, investment overview, charts, project performance, budget analysis, ranking, watchlist, generated date, and company logo placeholder.</p></div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button toolbar-button">Dashboard PDF</button><button class="button toolbar-button">Executive Report PDF</button><button class="button toolbar-button">Excel Summary</button><button class="button toolbar-button">CSV</button><button class="button">Generate Executive Report</button></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        `;
+      }
+
+      function settingsModuleMarkup() {
+        const groups = [
+          ["Investment Configuration", [["Fiscal Year", "2026"], ["Default Currency", "IDR"], ["Budget Threshold", "90%"], ["Project Health Threshold", "75%"], ["Portfolio Alert Threshold", "30 days"], ["Completion Target (%)", "95"], ["Default Project Status", "Running"], ["Default Priority", "High"]]],
+          ["Dashboard Configuration", [["Default Dashboard View", "Executive"], ["Default Year Filter", "Current Fiscal Year"], ["Default Portfolio Filter", "All Portfolios"], ["Refresh Interval", "15 minutes"]]],
+          ["Document Configuration", [["Allowed File Types", "PDF, DOCX, XLSX, PPTX"], ["Maximum Upload Size", "25 MB"], ["Document Versioning", "Enabled"]]],
+          ["Report Configuration", [["Company Name", "Investment Portfolio Management"], ["Company Logo", "Placeholder"], ["Report Header", "Executive Investment Report"], ["Report Footer", "Confidential"], ["Signature Placeholder", "Enabled"]]],
+          ["Notification Configuration", [["Upcoming Deadline Reminder", "14 days before"], ["Inactive Project Reminder", "7 days"], ["Document Upload Reminder", "Enabled"], ["Project Completion Reminder", "Enabled"], ["Enable / Disable Notifications", "Enabled"]]],
+        ];
+        return `
+          <div class="settings-page">
+            <section class="module-hero">
+              <div>
+                <div class="eyebrow">Investment Management Configuration</div>
+                <h2>Settings</h2>
+                <p class="small">Focused configuration for investment portfolio controls, dashboard defaults, documents, reports, and notifications.</p>
+              </div>
+              <span class="badge">Simplified settings</span>
+            </section>
+            <div class="settings-grid">
+              ${groups.map(([title, rows]) => `
+                <section class="config-card">
+                  <div class="config-head"><h2>${title}</h2>${svgIcon("Settings")}</div>
+                  ${rows.map(([label, value]) => `<label class="config-row"><span class="small">${label}</span><input value="${value}" /></label>`).join("")}
+                </section>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderModules() {
+        document.getElementById("Investment Request").innerHTML = moduleTemplate(
+          "Investment Request",
+          "Registration workflow for approved BRD-based investment projects.",
+          `
+            <div class="form-grid">
+              <div class="field"><label>BRD Number</label><input value="BRD-26013"></div>
+              <div class="field"><label>Status</label><select><option>Draft</option><option>Submitted</option><option>Under Review</option><option>Approved</option></select></div>
+              <div class="field"><label>Project Name</label><input placeholder="Project name"></div>
+              <div class="field"><label>Budget Approved</label><input placeholder="0"></div>
+              <div class="field" style="grid-column:1/-1"><label>Project Objective</label><textarea placeholder="Objective and business justification"></textarea></div>
+            </div>
+          `
+        );
+
+        document.getElementById("Project Workspace").innerHTML = moduleTemplate(
+          "Project Workspace",
+          "Dedicated project control room with Overview, Activity, Documents, Review, and Settings tabs.",
+          `
+            ${workspaceMarkup()}
+          `
+        );
+
+        document.getElementById("Documents").innerHTML = moduleTemplate(
+          "Document Management",
+          "Project-grouped document repository inspired by Google Drive and Windows Explorer.",
+          documentFolderMarkup()
+        );
+
+        document.getElementById("Analytics").innerHTML = analyticsModuleMarkup();
+
+        document.getElementById("Master Data").innerHTML = moduleTemplate(
+          "Master Data",
+          "CRUD scaffolds for divisions, departments, sites, vendors, project categories, statuses, priorities, issue categories, and severities.",
+          `<div class="grid three-grid">${["Division", "Department", "Site", "Vendor", "Project Category", "Project Status", "Priority", "Issue Category", "Issue Severity"].map((item) => `<div class="stage"><strong>${item}</strong><p class="small">Create, edit, archive, search.</p></div>`).join("")}</div>`
+        );
+
+        document.getElementById("Settings").innerHTML = settingsModuleMarkup();
+      }
+
+      function timelineMarkup(items) {
+        return `<div class="timeline">${items.map(([title, text]) => `<div class="timeline-item"><span class="timeline-node"></span><div class="timeline-card"><strong>${title}</strong><p>${text}</p></div></div>`).join("")}</div>`;
+      }
+
+      function showToast(title, text) {
+        const toast = document.getElementById("toast");
+        document.getElementById("toastTitle").textContent = title;
+        document.getElementById("toastText").textContent = text;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      function saveProjectFromForm(form) {
+        const values = Object.fromEntries(new FormData(form).entries());
+        const saved = {
+          id: `mock-${Date.now()}`,
+          ...values,
+          category: "IT System",
+          status: "Draft",
+          health: "Green",
+          pic: "Investment Admin",
+          approved: Number(values.budget || 0),
+          actual: 0,
+          progress: 0,
+          approvalDays: 0,
+          budget: Number(values.budget || 0),
+          remarks: "Created in the static GitHub Pages preview.",
+          updatedAt: new Date().toISOString(),
+        };
+        projects = [saved, ...projects.filter((project) => project.id !== saved.id)];
+        render();
+        return saved;
+      }
+
+      function setRoute(route) {
+        state.route = route;
+        document.querySelectorAll(".route").forEach((node) => node.classList.toggle("active", node.id === route));
+        document.getElementById("pageTitle").textContent = route === "Dashboard" ? "Portfolio Command Center" : route;
+        document.getElementById("breadcrumbs").textContent = `Home / ${route}`;
+        document.getElementById("sidebar").classList.remove("open");
+        renderNav();
+      }
+
+      function render() {
+        const rows = filteredProjects();
+        renderNav();
+        renderFilters();
+        renderKpis(rows);
+        renderLineChart();
+        renderHealthBars(rows);
+        renderProjectCalendar();
+        groupedBars("divisionBars", rows, "division", "approved", 5);
+        renderBudgetBars(rows);
+        renderCategoryDonut(rows);
+        renderStatusDonut(rows);
+        renderCompletionArea();
+        renderProjectHighlight(rows);
+        renderTimeline();
+        renderTable(rows);
+        renderModules();
+      }
+
+      document.addEventListener("click", (event) => {
+        const routeButton = event.target.closest("[data-route]");
+        if (routeButton) setRoute(routeButton.dataset.route);
+        const actionButton = event.target.closest("[data-action]");
+        if (actionButton?.dataset.action === "refresh") {
+          render();
+          showToast("Dashboard refreshed", "Executive metrics and portfolio views were refreshed.");
+        }
+        if (actionButton?.dataset.action === "export") {
+          showToast("Export queued", "Static preview export action is ready for the production build.");
+        }
+        if (actionButton?.dataset.action === "advanced-filter") {
+          showToast("Advanced filter", "Additional Site, Priority, PIC, and date filters are planned for the full version.");
+        }
+        if (actionButton?.dataset.action === "new-investment") {
+          document.getElementById("drawer").classList.add("open");
+        }
+        if (actionButton?.dataset.action === "upload-document") {
+          showToast("Upload document", "Document upload is represented in the static preview.");
+        }
+        if (actionButton?.dataset.action === "generate-report") {
+          showToast("Report generator", "Corporate PDF report generation is represented for the production build.");
+        }
+        const healthCard = event.target.closest("[data-health-filter]");
+        if (healthCard) {
+          state.filters.health = state.filters.health === healthCard.dataset.healthFilter ? "All" : healthCard.dataset.healthFilter;
+          state.table.page = 1;
+          render();
+        }
+        const sortable = event.target.closest("th[data-sort]");
+        if (sortable) {
+          const key = sortable.dataset.sort;
+          state.table.sortDir = state.table.sortKey === key && state.table.sortDir === "desc" ? "asc" : "desc";
+          state.table.sortKey = key;
+          render();
+        }
+        const pageButton = event.target.closest("[data-page]");
+        if (pageButton) {
+          state.table.page += pageButton.dataset.page === "next" ? 1 : -1;
+          if (state.table.page < 1) state.table.page = 1;
+          render();
+        }
+        const calendarButton = event.target.closest("[data-calendar-view]");
+        if (calendarButton) {
+          state.calendarView = calendarButton.dataset.calendarView;
+          renderProjectCalendar();
+        }
+      });
+
+      document.addEventListener("change", (event) => {
+        const filter = event.target.dataset.filter;
+        if (filter) {
+          state.filters[filter] = event.target.value;
+          render();
+        }
+      });
+
+      document.getElementById("globalSearch").addEventListener("input", (event) => {
+        state.search = event.target.value;
+        render();
+      });
+
+      document.getElementById("themeButton").addEventListener("click", () => {
+        const next = document.body.dataset.theme === "dark" ? "" : "dark";
+        document.body.dataset.theme = next;
+        localStorage.setItem("ims-theme", next);
+      });
+
+      document.getElementById("exportButton").addEventListener("click", () => showToast("Export queued", "Excel, PDF, and CSV exports are represented in this preview."));
+      document.getElementById("drawerBackdrop").addEventListener("click", () => document.getElementById("drawer").classList.remove("open"));
+      document.getElementById("closeDrawer").addEventListener("click", () => document.getElementById("drawer").classList.remove("open"));
+      document.getElementById("menuButton").addEventListener("click", () => document.getElementById("sidebar").classList.add("open"));
+      document.getElementById("previewImportButton").addEventListener("click", () => showToast("Import preview ready", "Validation, duplicate detection, and error report flow are scaffolded."));
+      document.getElementById("requestForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        try {
+          const saved = saveProjectFromForm(event.currentTarget);
+          document.getElementById("drawer").classList.remove("open");
+          showToast("Draft added", `${saved.brd} was added to the static preview data.`);
+        } catch (error) {
+          showToast("Save failed", error.message);
+        }
+      });
+
+      document.body.dataset.theme = localStorage.getItem("ims-theme") || "";
+      render();
+    </script>
+  </body>
+</html>
+
