@@ -1,0 +1,14 @@
+{
+  "source": "C:\\Users\\LENOVO\\Downloads\\brd_sulona_backend_simple_input.xlsx",
+  "projects": 14,
+  "activities": 70,
+  "documents": 0,
+  "issues": 3,
+  "calendarItems": 40,
+  "sheets": [
+    "INPUT_PROJECT",
+    "INPUT_ACTIVITY",
+    "MASTER_DATA",
+    "Dashboard"
+  ]
+}

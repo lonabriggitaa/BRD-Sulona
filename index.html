@@ -1002,6 +1002,128 @@
         margin-top: 16px;
       }
 
+      .workspace-documents-panel {
+        grid-column: 1 / -1;
+      }
+
+      .document-workspace {
+        display: grid;
+        gap: 14px;
+        min-width: 0;
+      }
+
+      .document-summary-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 14px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: linear-gradient(180deg, var(--surface-2), var(--surface));
+        padding: 16px;
+        min-width: 0;
+      }
+
+      .document-summary-card > div {
+        min-width: 0;
+      }
+
+      .document-summary-card .highlight-title {
+        overflow-wrap: anywhere;
+      }
+
+      .document-summary-card .button {
+        align-self: center;
+        min-width: 156px;
+        padding-inline: 14px;
+      }
+
+      .document-metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(120px, 1fr));
+        gap: 12px;
+      }
+
+      .required-checklist {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+      }
+
+      .checklist-item,
+      .document-type-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface);
+        padding: 12px;
+      }
+
+      .checklist-item {
+        display: grid;
+        gap: 8px;
+        min-height: 78px;
+      }
+
+      .document-type-groups {
+        display: grid;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .document-type-card {
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .document-type-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .doc-row.missing {
+        grid-template-columns: minmax(120px, 1fr) auto minmax(140px, 1fr);
+      }
+
+      .document-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 70;
+        display: none;
+      }
+
+      .document-modal.open {
+        display: block;
+      }
+
+      .document-modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, .32);
+        backdrop-filter: blur(3px);
+      }
+
+      .document-modal-panel {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: min(720px, calc(100vw - 32px));
+        max-height: calc(100vh - 40px);
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--surface);
+        box-shadow: 0 30px 80px rgba(15, 23, 42, .3);
+        padding: 18px;
+        transform: translate(-50%, -50%);
+      }
+
+      .document-modal-panel .icon-button {
+        transform: rotate(45deg);
+      }
+
       .activity-feed {
         position: relative;
         display: grid;
@@ -2246,6 +2368,14 @@
           grid-template-columns: 1fr;
         }
 
+        .required-checklist {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .document-metric-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
         .activity-feed {
           max-height: none;
         }
@@ -2382,6 +2512,23 @@
           background: color-mix(in srgb, var(--surface) 96%, transparent);
           box-shadow: 0 24px 60px rgba(15, 23, 42, .22);
           padding: 10px;
+        }
+
+        .document-summary-card {
+          align-items: stretch;
+          grid-template-columns: 1fr;
+        }
+
+        .document-summary-card .button {
+          width: 100%;
+        }
+
+        .required-checklist {
+          grid-template-columns: 1fr;
+        }
+
+        .document-metric-grid {
+          grid-template-columns: 1fr;
         }
 
         .activity-date-block {
@@ -2599,7 +2746,6 @@
           <section id="Investment Request" class="route"></section>
           <section id="Project Workspace" class="route"></section>
           <section id="Import Update" class="route"></section>
-          <section id="Documents" class="route"></section>
           <section id="Analytics" class="route"></section>
           <section id="Master Data" class="route"></section>
           <section id="Settings" class="route"></section>
@@ -2608,6 +2754,7 @@
     </div>
 
     <div class="floating-quick-action" id="floatingQuickAction"></div>
+    <div class="document-modal" id="documentModal"></div>
 
     <div class="drawer" id="drawer" aria-hidden="true">
       <div class="drawer-backdrop" id="drawerBackdrop"></div>
@@ -4052,7 +4199,7 @@ const trend = [
         ["Dec", 72.4, 63.2],
       ];
 
-      const navItems = ["Dashboard", "Project Workspace", "Documents", "Import Update", "Analytics", "Master Data", "Settings"];
+      const navItems = ["Dashboard", "Project Workspace", "Import Update", "Analytics", "Master Data", "Settings"];
 
       const icons = {
         Dashboard: "M4 13h7V4H4v9Zm9 7h7V4h-7v16ZM4 20h7v-5H4v5Z",
@@ -4092,6 +4239,7 @@ const trend = [
         },
         reminderIndex: 0,
         quickActionOpen: false,
+        documentModalOpen: false,
         table: {
           page: 1,
           pageSize: 8,
@@ -4647,7 +4795,8 @@ function idr(value) {
         return ["All", ...Array.from(new Set(projects.map((item) => item[key]))).sort()];
       }
 
-      const REQUIRED_DOCUMENTS = ["BRD", "Financial Analysis", "Quotation", "Contract", "Progress Report", "LPJ", "Final Report"];
+      const REQUIRED_DOCUMENTS = ["BRD", "Quotation", "Progress Report", "LPJ", "Final Report"];
+      const DOCUMENT_TYPE_OPTIONS = [...REQUIRED_DOCUMENTS, "Others"];
       const PASSIVE_STATUSES = ["Draft", "Submitted", "Approved", "Closed", "Cancelled", "Rejected"];
       const TODAY = new Date("2026-07-07T00:00:00");
 
@@ -4681,6 +4830,31 @@ function idr(value) {
         const label = percent <= 40 ? "Incomplete" : percent <= 80 ? "Partial" : "Complete";
         const cls = percent <= 40 ? "status-critical" : percent <= 80 ? "status-pending" : "status-completed";
         return { count, total: REQUIRED_DOCUMENTS.length, percent, label, cls };
+      }
+
+      function documentStatus(doc) {
+        return doc.Status || doc.status || doc.document_status || "Uploaded";
+      }
+
+      function documentUploadDate(doc) {
+        return doc["Upload Date"] || doc.uploadDate || doc.upload_date || "-";
+      }
+
+      function documentName(doc) {
+        return doc["Document Name"] || doc.documentName || doc.document_name || doc["File Name"] || doc.fileName || doc.file_name || documentType(doc) || "Project Document";
+      }
+
+      function documentCompletenessSummary(project) {
+        const docs = projectDocuments(project);
+        const completeness = documentCompleteness(project);
+        const missing = REQUIRED_DOCUMENTS.filter((required) => !docs.some((doc) => documentType(doc) === required));
+        const dates = docs.map(documentUploadDate).filter((value) => value && value !== "-").sort();
+        return {
+          docs,
+          completeness,
+          missing,
+          lastUploaded: dates.length ? dates[dates.length - 1] : "-",
+        };
       }
 
       function completenessBar(project, compact = false) {
@@ -5335,6 +5509,70 @@ function idr(value) {
         `;
       }
 
+      function projectDocumentRepositoryMarkup(project) {
+        const summary = documentCompletenessSummary(project);
+        const groupedTypes = DOCUMENT_TYPE_OPTIONS;
+        const statusClassForDoc = (status) => {
+          if (status === "Approved" || status === "Uploaded") return "status-completed";
+          if (status === "Draft" || status === "Revised") return "status-pending";
+          return "status-critical";
+        };
+        return `
+          <div class="document-workspace">
+            <div class="document-summary-card">
+              <div>
+                <span class="badge">${project.brd}</span>
+                <h3 class="highlight-title">${project.name}</h3>
+                <p class="small">Project-based document repository. Uploads here are linked automatically to this project.</p>
+              </div>
+              <button class="button primary" type="button" data-upload-document>${uiIcon("UploadCloud")} Upload Document</button>
+            </div>
+            <div class="document-metric-grid">
+              <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Document Completeness</span><strong class="workspace-kpi-value">${summary.completeness.percent}%</strong></div>
+              <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Total Documents</span><strong class="workspace-kpi-value">${summary.docs.length}</strong></div>
+              <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Missing Documents</span><strong class="workspace-kpi-value">${summary.missing.length}</strong></div>
+              <div class="workspace-kpi-tile"><span class="workspace-kpi-label">Last Uploaded</span><strong class="workspace-kpi-value">${summary.lastUploaded}</strong></div>
+            </div>
+            <div style="margin-top:14px">${completenessBar(project)}</div>
+            <div class="required-checklist">
+              ${REQUIRED_DOCUMENTS.map((required) => {
+                const doc = summary.docs.find((item) => documentType(item) === required);
+                const status = doc ? documentStatus(doc) : "Missing";
+                return `<div class="checklist-item"><strong>${required}</strong><span class="status-pill ${statusClassForDoc(status)}">${status}</span></div>`;
+              }).join("")}
+            </div>
+            <div class="document-type-groups">
+              ${groupedTypes.map((type) => {
+                const docs = summary.docs.filter((doc) => documentType(doc) === type || (type === "Others" && !REQUIRED_DOCUMENTS.includes(documentType(doc))));
+                return `
+                  <section class="document-type-card">
+                    <div class="document-type-head"><h3>${type}</h3><span class="badge">${docs.length || "Missing"}</span></div>
+                    <div class="doc-grid">
+                      ${docs.length ? docs.map((doc) => {
+                        const status = documentStatus(doc);
+                        return `
+                          <div class="doc-row">
+                            <strong>${documentName(doc)}</strong>
+                            <span class="badge">${doc.Version || doc.version || "v1.0"}</span>
+                            <span class="small">${documentUploadDate(doc)}</span>
+                            <span class="small">${doc["Uploaded By"] || doc.uploadedBy || "Investment Admin"}</span>
+                            <span class="status-pill ${statusClassForDoc(status)}">${status}</span>
+                            <span class="small">${doc.remarks || doc.Remarks || "-"}</span>
+                            <button class="button toolbar-button" type="button" data-preview-document="${doc.id || documentName(doc)}">Preview</button>
+                            <button class="button toolbar-button" type="button" data-download-document="${doc.id || documentName(doc)}">Download</button>
+                            <button class="button toolbar-button" type="button" data-delete-document="${doc.id || documentName(doc)}">Delete</button>
+                          </div>
+                        `;
+                      }).join("") : `<div class="doc-row missing"><strong>${type}</strong><span class="status-pill status-critical">Missing</span><span class="small">No metadata uploaded yet.</span></div>`}
+                    </div>
+                  </section>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      }
+
       function workspaceMarkup() {
         if (!projects.length) return `<div class="empty">No project workspace available.</div>`;
         const selected = projects.find((item) => String(item.id) === String(state.workspace.selectedProjectId));
@@ -5344,11 +5582,6 @@ function idr(value) {
         const duration = project.start && project.finish ? Math.max(0, Math.ceil((new Date(project.finish) - new Date(project.start)) / 86400000)) : 0;
         const delay = healthLabel(project)[0] === "Critical" ? "Needs action" : "On track";
         const projectActs = activities.filter((item) => item.projectId === project.id || item.brd === project.brd || item.project === project.name).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
-        const projectDocs = projectDocuments(project);
-        const requiredRows = REQUIRED_DOCUMENTS.map((required) => {
-          const found = projectDocs.find((doc) => documentType(doc) === required);
-          return `<div class="doc-row"><strong>${required}</strong><span class="status-pill ${found ? "status-completed" : "status-critical"}">${found ? "Uploaded" : "Missing"}</span><span class="small">${found?.["Upload Date"] || found?.uploadDate || found?.upload_date || "-"}</span><span class="small">${found?.version || found?.Version || "-"}</span></div>`;
-        }).join("");
         return `
           <button class="button toolbar-button" type="button" data-workspace-back>${uiIcon("ChevronLeft")} Back to Project List</button>
           <div class="workflow" style="margin-top:14px">${["Overview", "Activity", "Documents", "Review", "Settings"].map((tab, index) => `<div class="stage"><strong>${tab}</strong><span class="status-pill ${index === 0 ? "status-running" : "status-completed"}">${index === 0 ? "Active" : "Ready"}</span><p class="small" style="margin-top:8px">${tab === "Activity" ? "Daily Project Journal." : tab === "Review" ? "Corporate final report." : "Workspace module."}</p></div>`).join("")}</div>
@@ -5379,7 +5612,7 @@ function idr(value) {
           </div>
           <div class="workspace-detail-grid">
             <section class="panel"><div class="panel-header"><h2>Activity</h2><span class="badge">${projectActs.length} updates</span></div><div class="panel-body activity-feed">${projectActs.slice(0, 8).map((item) => `<article class="activity-card"><div class="activity-dot">${activityIcon(item.type)}</div><div><strong>${item.title || item.type}</strong><p class="small">${item.date || "-"} / ${item.pic || project.pic || "-"}</p><p>${item.text || item.note || "-"}</p></div></article>`).join("") || `<div class="empty">No activity updates yet.</div>`}</div></section>
-            <section class="panel"><div class="panel-header"><h2>Documents</h2><span class="badge">${documentCompleteness(project).percent}% complete</span></div><div class="panel-body">${completenessBar(project)}<div class="doc-grid" style="margin-top:14px">${requiredRows}</div></div></section>
+            <section class="panel workspace-documents-panel"><div class="panel-header"><h2>Documents</h2><span class="badge">${documentCompleteness(project).percent}% complete</span></div><div class="panel-body">${projectDocumentRepositoryMarkup(project)}</div></section>
             <section class="panel"><div class="panel-header"><h2>Review</h2><span class="badge">${project.status}</span></div><div class="panel-body"><p>${project.remarks || "Project review will be completed when closing documents and benefits are finalized."}</p><div class="metric-row"><div class="metric-tile"><span class="metric-label">Budget Performance</span><strong class="metric-value">${idr(variance)}</strong></div><div class="metric-tile"><span class="metric-label">Benefit Realization</span><strong class="metric-value">${project.progress}%</strong></div></div></div></section>
             <section class="panel"><div class="panel-header"><h2>Settings</h2><span class="badge">Read only</span></div><div class="panel-body"><div class="config-row"><span class="small">BRD Number</span><strong>${project.brd}</strong></div><div class="config-row"><span class="small">Division</span><strong>${project.division}</strong></div><div class="config-row"><span class="small">Site</span><strong>${project.site || "-"}</strong></div><div class="config-row"><span class="small">Vendor</span><strong>${project.vendor || "-"}</strong></div></div></section>
           </div>
@@ -5389,12 +5622,12 @@ function idr(value) {
       function renderFloatingQuickAction() {
         const host = document.getElementById("floatingQuickAction");
         if (!host) return;
-        const visibleRoutes = ["Dashboard", "Project Workspace", "Documents", "Analytics"];
+        const visibleRoutes = ["Dashboard", "Project Workspace", "Analytics"];
         const isVisible = visibleRoutes.includes(state.route);
         const actions = [
           ["new-investment", "Plus", "New Investment", "Create a new investment draft."],
           ["add-activity", "Activity", "Add Activity", "Open project activity workspace."],
-          ["upload-document", "FileCheck", "Upload Document", "Go to document upload area."],
+          ["upload-document", "FileCheck", "Upload Document", "Upload document for selected project."],
           ["generate-report", "ClipboardCheck", "Generate Report", "Prepare executive report."],
           ["import-update", "UploadCloud", "Import Update", "Upload Excel backend data."],
           ["refresh-dashboard", "TrendingUp", "Refresh Dashboard", "Refresh current dashboard data."],
@@ -5415,6 +5648,67 @@ function idr(value) {
             <span class="fab-label">Quick Action</span>
           </button>
         `;
+      }
+
+      function renderDocumentModal() {
+        const host = document.getElementById("documentModal");
+        if (!host) return;
+        const project = projects.find((item) => String(item.id) === String(state.workspace.selectedProjectId));
+        host.className = `document-modal ${state.documentModalOpen && project ? "open" : ""}`;
+        host.innerHTML = project ? `
+          <div class="document-modal-backdrop" data-document-modal-close></div>
+          <form class="document-modal-panel" id="documentUploadForm">
+            <div class="panel-header">
+              <div>
+                <h2>Upload Document</h2>
+                <p class="small">${project.name} / ${project.brd}</p>
+              </div>
+              <button class="icon-button" type="button" data-document-modal-close aria-label="Close upload form">${uiIcon("Plus")}</button>
+            </div>
+            <div class="form-grid">
+              <div class="field"><label>Document Type</label><select name="documentType" required>${DOCUMENT_TYPE_OPTIONS.map((type) => `<option>${type}</option>`).join("")}</select></div>
+              <div class="field"><label>Document Name</label><input name="documentName" placeholder="Document name" required></div>
+              <div class="field"><label>Upload Date</label><input name="uploadDate" type="date" value="${new Date().toISOString().slice(0, 10)}"></div>
+              <div class="field"><label>Status</label><select name="status"><option>Uploaded</option><option>Draft</option><option>Revised</option><option>Approved</option></select></div>
+              <div class="field" style="grid-column:1/-1"><label>Remarks</label><textarea name="remarks" placeholder="Optional notes"></textarea></div>
+              <div class="field" style="grid-column:1/-1"><label>File Upload</label><input name="file" type="file"></div>
+            </div>
+            <div class="detail-toolbar" style="margin-top:14px">
+              <span class="small">Project is linked automatically. No project selection required.</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="button toolbar-button" type="button" data-document-modal-close>Cancel</button>
+                <button class="button primary" type="submit">Upload Document</button>
+              </div>
+            </div>
+          </form>
+        ` : "";
+      }
+
+      function saveDocumentFromModal(form) {
+        const project = projects.find((item) => String(item.id) === String(state.workspace.selectedProjectId));
+        if (!project) throw new Error("Select a project first.");
+        const values = Object.fromEntries(new FormData(form).entries());
+        const fileInput = form.querySelector('input[type="file"]');
+        const file = fileInput?.files?.[0];
+        documents = [{
+          id: `doc-${Date.now()}`,
+          projectId: project.id,
+          brd: project.brd,
+          project: project.name,
+          "BRD Number": project.brd,
+          "Project Name": project.name,
+          "Document Type": values.documentType,
+          "Document Name": values.documentName || file?.name || values.documentType,
+          "File Name": file?.name || values.documentName || values.documentType,
+          version: "v1.0",
+          "Upload Date": values.uploadDate || new Date().toISOString().slice(0, 10),
+          status: values.status || "Uploaded",
+          remarks: values.remarks || "",
+          uploadedBy: "Investment Admin",
+        }, ...documents];
+        state.documentModalOpen = false;
+        render();
+        showToast("Document uploaded", `${values.documentType} was linked to ${project.brd}.`);
       }
 
       function projectWorkspaceListMarkup() {
@@ -6014,12 +6308,6 @@ function idr(value) {
 
         document.getElementById("Import Update").innerHTML = importUpdateModuleMarkup();
 
-        document.getElementById("Documents").innerHTML = moduleTemplate(
-          "Document Management",
-          "Project-grouped document repository inspired by Google Drive and Windows Explorer.",
-          documentFolderMarkup()
-        );
-
         document.getElementById("Analytics").innerHTML = analyticsModuleMarkup();
 
         document.getElementById("Master Data").innerHTML = moduleTemplate(
@@ -6122,6 +6410,10 @@ function idr(value) {
       }
 
       function setRoute(route) {
+        if (route === "Documents") {
+          route = "Project Workspace";
+          showToast("Documents moved", "Documents are now managed inside each Project Workspace.");
+        }
         state.route = route;
         document.querySelectorAll(".route").forEach((node) => node.classList.toggle("active", node.id === route));
         document.getElementById("pageTitle").textContent = route === "Dashboard" ? "Portfolio Command Center" : route;
@@ -6151,6 +6443,7 @@ function idr(value) {
         renderTable(rows);
         renderModules();
         renderFloatingQuickAction();
+        renderDocumentModal();
       }
 
       document.addEventListener("click", (event) => {
@@ -6176,8 +6469,13 @@ function idr(value) {
             if (!state.workspace.selectedProjectId) showToast("Select project first", "Choose a project, then open the Activity tab.");
           }
           if (action === "upload-document") {
-            setRoute("Documents");
-            showToast("Upload document", "Document upload is represented in the Documents workspace.");
+            setRoute("Project Workspace");
+            if (state.workspace.selectedProjectId) {
+              state.documentModalOpen = true;
+              renderDocumentModal();
+            } else {
+              showToast("Select project first", "Documents are managed inside each Project Workspace.");
+            }
           }
           if (action === "generate-report") {
             setRoute("Analytics");
@@ -6227,7 +6525,13 @@ function idr(value) {
           document.getElementById("drawer").classList.add("open");
         }
         if (actionButton?.dataset.action === "upload-document") {
-          showToast("Upload document", "Document upload is represented in the static preview.");
+          setRoute("Project Workspace");
+          if (state.workspace.selectedProjectId) {
+            state.documentModalOpen = true;
+            renderDocumentModal();
+          } else {
+            showToast("Select project first", "Documents are now managed inside each Project Workspace.");
+          }
         }
         if (actionButton?.dataset.action === "generate-report") {
           showToast("Report generator", "Corporate PDF report generation is represented for the production build.");
@@ -6260,6 +6564,33 @@ function idr(value) {
         if (event.target.closest("[data-workspace-back]")) {
           state.workspace.selectedProjectId = null;
           renderModules();
+        }
+        if (event.target.closest("[data-upload-document]")) {
+          if (!state.workspace.selectedProjectId) {
+            showToast("Select project first", "Choose a project before uploading documents.");
+          } else {
+            state.documentModalOpen = true;
+            renderDocumentModal();
+          }
+        }
+        if (event.target.closest("[data-document-modal-close]")) {
+          state.documentModalOpen = false;
+          renderDocumentModal();
+        }
+        const previewDocument = event.target.closest("[data-preview-document]");
+        if (previewDocument) {
+          showToast("Preview document", "Document preview is represented in this static dashboard.");
+        }
+        const downloadDocument = event.target.closest("[data-download-document]");
+        if (downloadDocument) {
+          showToast("Download document", "Document download is represented in this static dashboard.");
+        }
+        const deleteDocument = event.target.closest("[data-delete-document]");
+        if (deleteDocument) {
+          const id = deleteDocument.dataset.deleteDocument;
+          documents = documents.filter((doc) => String(doc.id || documentName(doc)) !== String(id));
+          render();
+          showToast("Document deleted", "Document metadata was removed from this project workspace.");
         }
         const calendarAction = event.target.closest("[data-calendar-action]");
         if (calendarAction) {
@@ -6339,6 +6670,10 @@ function idr(value) {
       });
 
       document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && state.documentModalOpen) {
+          state.documentModalOpen = false;
+          renderDocumentModal();
+        }
         if (event.key === "Escape" && state.quickActionOpen) {
           state.quickActionOpen = false;
           renderFloatingQuickAction();
@@ -6369,6 +6704,17 @@ function idr(value) {
           showToast("Draft added", `${saved.brd} was added to the static preview data.`);
         } catch (error) {
           showToast("Save failed", error.message);
+        }
+      });
+
+      document.addEventListener("submit", (event) => {
+        if (event.target.id === "documentUploadForm") {
+          event.preventDefault();
+          try {
+            saveDocumentFromModal(event.target);
+          } catch (error) {
+            showToast("Upload failed", error.message);
+          }
         }
       });
 
